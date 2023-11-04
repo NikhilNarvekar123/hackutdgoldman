@@ -9,6 +9,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import { ChakraProvider } from '@chakra-ui/react';
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
@@ -26,10 +27,9 @@ const router = createBrowserRouter([
 
 
 root.render(
-  <>
-    <ColorModeScript />
+  <ChakraProvider>
     <RouterProvider router={router} />
-  </>
+  </ChakraProvider>
 );
 
 // If you want your app to work offline and load faster, you can change
