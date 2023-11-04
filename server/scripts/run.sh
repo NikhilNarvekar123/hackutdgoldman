@@ -1,1 +1,1 @@
-python3 server.py
+uvicorn src.api:app --reload --lifespan on --host 0.0.0.0 --port 8080
