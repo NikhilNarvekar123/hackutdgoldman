@@ -53,6 +53,3 @@ class Reddit:
         self.bottom_titles: List[str] = [message.content for message in messages[:3]]
 
         return messages
-
-if __name__ == "__main__":
-    print("hello world")
