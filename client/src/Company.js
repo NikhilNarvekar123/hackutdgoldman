@@ -7,6 +7,7 @@ import {ArrowUpIcon, ArrowDownIcon, CheckIcon, CloseIcon} from '@chakra-ui/icons
 import { CircularProgressLabel, CircularProgress } from "@chakra-ui/react";
 import axios from 'axios'
 import { useLocation } from 'react-router-dom';
+import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, Button } from '@chakra-ui/react';
 
 
 const data2 = {
@@ -245,6 +246,37 @@ const Company = () => {
     const [data, setStockData] = useState(null); // change all instances of data to stockData (the fetched api)
     const [riskMultiplier, setRiskMultiplier] = useState(1)
 
+    const [data1, setData1] = useState(null);
+
+
+	const [isOpen, setIsOpen] = useState(false);
+
+	const handleOpenPopover = () => {
+	  setIsOpen(true);
+	};
+  
+	const handleClosePopover = () => {
+	  setIsOpen(false);
+	};
+
+    const [urls, setUrls] = useState([]);
+    useEffect(() => {
+        // Define the URL
+        const url = 'http://localhost:8080/api/files?ticker=' + name
+    
+        // Make a GET request to the URL
+        axios.get(url)
+          .then((response) => {
+            // Handle the successful response here
+            setUrls(response.data['message']['links']);
+          })
+          .catch((error) => {
+            // Handle any errors here
+            console.error('Error fetching data:', error);
+          });
+      }, []);
+    
+
     useEffect(() => {
         const apiUrl = `http://127.0.0.1:8080/api/stock/?ticker=`;
         axios.get(apiUrl + name)
@@ -252,7 +284,8 @@ const Company = () => {
             // Set the state to the response data
             setStockData(response.data['message']['stock']);
             console.log(response.data['message']['stock']);
-            setRiskMultiplier(response.data['message']['stock']['earrnings']['cosine_scores'][11]);
+            setData1(response.data['message'])
+            setRiskMultiplier(response.data['message']['earnings']['cosine_scores'][11]);
             setRandomBaseScore(data["overall_rating"]);
             setScore(parseFloat((randomBaseScore*riskMultiplier).toFixed(2)));
           })
@@ -299,7 +332,7 @@ const Company = () => {
         });
         setVolumeArr(newArr2);
 
-        let earn = data['earnings']['cosine_scores'];
+        let earn = data1['earnings']['cosine_scores'];
         let idx4 = 0;
         let newArr4 = [];
         earn.forEach((item) => {
@@ -700,6 +733,30 @@ const Company = () => {
                         />
                     </GridItem>
 
+                    <Popover isOpen={isOpen} onClose={handleClosePopover}>
+        <PopoverTrigger>
+		
+			<Box
+			position="fixed"
+			bottom="20px" // Adjust as needed
+			right="20px" // Adjust as needed
+			>
+			<Button colorScheme="blue" size="md" onClick={handleOpenPopover}>
+				Earning Reports
+			</Button>
+			</Box>
+
+        </PopoverTrigger>
+
+        <PopoverContent maxH="200px" overflowY="auto">
+          <PopoverBody>
+            {/* list of urls */}
+            {urls.map((url, index) => (
+  <a key={index} href={url}>{url}</a>
+))}
+          </PopoverBody>
+        </PopoverContent>
+    </Popover>
                     </Flex>
 
                 </Grid>
