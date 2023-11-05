@@ -7,7 +7,7 @@ import {ArrowUpIcon, ArrowDownIcon, CheckIcon, CloseIcon} from '@chakra-ui/icons
 import { CircularProgressLabel, CircularProgress } from "@chakra-ui/react";
 import axios from 'axios'
 import { useLocation } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, Button } from '@chakra-ui/react';
+import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, Button, Link } from '@chakra-ui/react';
 
 
 const data2 = {
@@ -276,6 +276,8 @@ const Company = () => {
           });
       }, []);
     
+      const [randomBaseScore, setRandomBaseScore] = useState(1);
+    const [score, setScore] = useState(50);
 
     useEffect(() => {
         const apiUrl = `http://127.0.0.1:8080/api/stock/?ticker=`;
@@ -283,16 +285,20 @@ const Company = () => {
           .then(response => {
             // Set the state to the response data
             setStockData(response.data['message']['stock']);
+            console.log("HELLO")
             console.log(response.data['message']['stock']);
             setData1(response.data['message'])
             setRiskMultiplier(response.data['message']['earnings']['cosine_scores'][11]);
-            setRandomBaseScore(data["overall_rating"]);
-            setScore(parseFloat((randomBaseScore*riskMultiplier).toFixed(2)));
+            const ran = (response.data['message']['stock']['stock_info']['perception'] + response.data['message']['stock']['stock_info']['popularity']) / 2
+            setRandomBaseScore(parseFloat(ran.toFixed(2)));
+            setScore(parseFloat((ran*riskMultiplier).toFixed(2)));
           })
           .catch(error => {
             console.error('Error:', error);
           });
       }, [name]);
+
+      console.log("RIKS", riskMultiplier)
 
     useEffect(() => {
 
@@ -335,6 +341,7 @@ const Company = () => {
         let earn = data1['earnings']['cosine_scores'];
         let idx4 = 0;
         let newArr4 = [];
+        console.log("HERE", earn)
         earn.forEach((item) => {
             // Extract and push the values of the fields into their respective arrays
             newArr4.push({name: abbreviatedMonths[idx4], earned: parseFloat(item.toFixed(2))});
@@ -373,10 +380,7 @@ const Company = () => {
         setSources(tempState);
         }
     }, [data])
-    
 
-    const [randomBaseScore, setRandomBaseScore] = useState(1);
-    const [score, setScore] = useState(50);
 
     // const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
     const [circScore, setCircScore] = useState(100*(score < 0))
@@ -392,6 +396,7 @@ const Company = () => {
         }, 20); 
     }, [circScore, score])
     console.log(circScore)
+    console.log("EARN", randomBaseScore)
     return(
         <>
         
@@ -452,6 +457,11 @@ const Company = () => {
 				</Flex>
 
                 <Grid templateColumns={'repeat(1, 1fr)'} gap={6} w="100%" display={!isChecked ? "none" : "block"}>
+                    
+                    <GridItem w='100%'>
+                        <Card metricName={"Market Analysis"} title={data['ticker']} description={data['stock_info']['blurb']}/>
+                    </GridItem>
+                    
                     <GridItem w='100%'>
                         <Card metricName={"Description"} title={data['name']} description={data["stock_info"]["description"]} author={"Industry: " + data['sub_industry']}/>
                     </GridItem>
@@ -532,10 +542,6 @@ const Company = () => {
                         />
                     </GridItem>
 
-                    <GridItem w='100%'>
-                        <Card metricName={"Market Analysis"} title={data['ticker']} description={data['stock_info']['blurb']}/>
-                    </GridItem>
-
                     <GridItem w='100%' justifySelf="center">
                         <GraphCard metricName={"Volume History"} graph={
                             <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
@@ -574,14 +580,14 @@ const Company = () => {
                     <GridItem w='100%' justifySelf="center">
                         <GraphCard metricName={"Change in Earnings"} graph={
                             <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
-                                <AreaChart isAnimationActive={false} data={earnings}>
+                                <LineChart isAnimationActive={false} data={earnings}>
                                     <CartesianGrid stroke="#ccc" fill="white"/>
                                     <XAxis dataKey="name" />
                                     <YAxis />
                                     <Tooltip />
                                     <Legend />
                                     <Line type="monotone" isAnimationActive={false} dataKey="earned" name="Difference in Earning Reports" stroke="#8884d8" />
-                                </AreaChart>
+                                </LineChart>
                             </ResponsiveContainer>
                         }
                         />
@@ -655,6 +661,22 @@ const Company = () => {
                         />
                     </GridItem>
 
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Change in Earnings"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={earnings}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="earned" name="Difference in Earning Reports" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
                     </Flex>
 
                     <Flex flexDirection="column">
@@ -717,23 +739,11 @@ const Company = () => {
                         />
                     </GridItem>
 
-                    <GridItem w='100%' justifySelf="center">
-                        <GraphCard metricName={"Change in Earnings"} graph={
-                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
-                                <LineChart isAnimationActive={false} data={earnings}>
-                                    <CartesianGrid stroke="#ccc" fill="white"/>
-                                    <XAxis dataKey="name" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Line type="monotone" isAnimationActive={false} dataKey="earned" name="Difference in Earning Reports" stroke="#8884d8" />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        }
-                        />
-                    </GridItem>
 
-                    <Popover isOpen={isOpen} onClose={handleClosePopover}>
+                    </Flex>
+
+                </Grid>
+                <Popover isOpen={isOpen} onClose={handleClosePopover}>
         <PopoverTrigger>
 		
 			<Box
@@ -752,14 +762,12 @@ const Company = () => {
           <PopoverBody>
             {/* list of urls */}
             {urls.map((url, index) => (
-  <a key={index} href={url}>{url}</a>
+
+  <Text key={index}><Link href={"http://localhost:8080" + url}>Report {index + 1}</Link></Text>
 ))}
           </PopoverBody>
         </PopoverContent>
     </Popover>
-                    </Flex>
-
-                </Grid>
 
                 </>
                 }
