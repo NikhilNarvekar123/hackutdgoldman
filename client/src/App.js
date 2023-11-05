@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "./DataTable.tsx";
 import axios from 'axios';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // const data = [
 // 	{
@@ -97,6 +98,7 @@ function App() {
   const [lowCols, setLowCols] = useState([])
   const [topInd, setTopInd] = useState([])
   const [topCols, setTopCols] = useState([])
+  const [econData, setEconData] = useState(null)
 
   function makeTable(leaderboardData) {
     let data = [];
@@ -184,6 +186,7 @@ function App() {
     .get(apiUrl)
     .then((response) => {
       console.log("econ", response);
+      setEconData(response.data)
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
@@ -229,6 +232,60 @@ function App() {
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
+
+  const [ppiArr, setPpiArr] = useState([])
+  const [csArr, setCsArr] = useState([])
+  const [fsArr, setFsArr] = useState([])
+  const [snp, setSnp] = useState([])
+  useEffect(() => {
+
+    // Loop through the array of objects
+    const abbreviatedMonths = [
+        "Dec", "Jan", "Feb", "Mar", "Apr", "May",
+        "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"
+    ];
+    let ppi_data = econData['message']['producer_price_index']['data'];
+    let idx = 0;
+    let newArr = [];
+    ppi_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr.push({name: abbreviatedMonths[idx], ppi: item});
+        idx += 1;
+    });
+    setPpiArr(newArr);
+
+    let cs_data = econData['message']['consumer_sentiment']['data'];
+    let idx1 = 0;
+    let newArr1 = [];
+    cs_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr.push({name: abbreviatedMonths[idx1], cs: item});
+        idx1 += 1;
+    });
+    setCsArr(newArr1)
+
+    let fs_data = econData['message']['financial_stress']['data'];
+    let idx2 = 0;
+    let newArr2 = [];
+    fs_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr2.push({name: abbreviatedMonths[idx2], fs: item});
+        idx2 += 1;
+    });
+    setFsArr(newArr2)
+
+    let snp_data = econData['message']['snp500']['data'];
+    let idx3 = 0;
+    let newArr3 = [];
+    ppi_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr3.push({name: abbreviatedMonths[idx], snp: item});
+        idx3 += 1;
+    });
+    setSnp(newArr3)
+
+
+    }, [econData])
   
 
   return (
@@ -315,6 +372,17 @@ function App() {
 				Top Industries
 			</Text>
 			<DataTable columns={topCols} data={topInd} />
+
+      <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={ppiArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="ppi" name="Producer Price Index" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
       
 	</Stack>
     </Container>
