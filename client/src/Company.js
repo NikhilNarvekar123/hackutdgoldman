@@ -100,7 +100,7 @@ const Company = () => {
                                 </Box>
                             </Flex>
                         </Flex>
-                        <div><Scores/></div>
+                        <div><Scores score1={90} score2={85} score3={78} score4={92}/></div>
                     </Flex>
                 </Box>
 
