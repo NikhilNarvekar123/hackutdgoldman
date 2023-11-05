@@ -253,6 +253,8 @@ const Company = () => {
             setStockData(response.data['message']['stock']);
             console.log(response.data['message']['stock']);
             setRiskMultiplier(response.data['message']['stock']['earrnings']['cosine_scores'][11]);
+            setRandomBaseScore(data["overall_rating"]);
+            setScore(parseFloat((randomBaseScore*riskMultiplier).toFixed(2)));
           })
           .catch(error => {
             console.error('Error:', error);
@@ -339,9 +341,10 @@ const Company = () => {
         }
     }, [data])
 
+    const [randomBaseScore, setRandomBaseScore] = useState(1);
+    const [score, setScore] = useState(50);
+
     // const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
-    const randomBaseScore = data["overall_rating"];
-    const score = parseFloat((randomBaseScore*riskMultiplier).toFixed(2));
     const [circScore, setCircScore] = useState(100*(score < 0))
     useEffect(() => {
         const timer = setInterval(() => {
