@@ -45,6 +45,5 @@ async def top_industries():
         message=Mongo.get_top_industries()
     )
 
-
 if __name__ == "__main__":
     app.run()
