@@ -9,6 +9,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react';
+import Company from './Company';
+import Category from './Category';
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
@@ -21,6 +23,14 @@ const router = createBrowserRouter([
   {
     path: "/loading",
     element: <Loading/>,
+  },
+  {
+    path: "/company/:company",
+    element: <Company/>,
+  },
+  {
+    path: "/category/:category",
+    element: <Category/>,
   },
 ]);
 
