@@ -63,6 +63,18 @@ function App() {
 		setIsChecked(!isChecked);
 	};
 
+
+	const [show, setShow] = React.useState(false)
+	let audio = new Audio("/PATH")
+
+	React.useEffect(() => {
+		const timeout = setTimeout(() => {
+			audio.play();
+		}, 5000)
+		return () => clearTimeout(timeout)
+	}, [show])
+
+
 	const onSubmit = () => {
 		if(isChecked) {
 			if (dropdownValue.length == 0) {
