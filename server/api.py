@@ -1,5 +1,4 @@
 import sqlite3
-from typing import Tuple, Dict, List
 from scraper import Scraper
 
 
@@ -41,13 +40,13 @@ def get_db_connection():
         conn.close()
 
 @app.get("/api/v1/stock")
-def stock(ticker: str, conn: sqlite3.Connection = Depends(get_db_connection)) -> Dict[str, str]:
+def stock(ticker: str, conn: sqlite3.Connection = Depends(get_db_connection)) -> dict[str, str]:
     cursor: sqlite3.Cursor = conn.cursor()
     cursor.execute("SELECT * FROM stocks WHERE ticker = ?", (ticker,))
 
     if row := cursor.fetchone():
         column_names = [column[0] for column in cursor.description]
-        data: Dict[str, str] = dict(zip(column_names, row))
+        data: dict[str, str] = dict(zip(column_names, row))
         data['success'] = True
         return ResponseModel(success=True, message=data)
     else:
@@ -55,27 +54,27 @@ def stock(ticker: str, conn: sqlite3.Connection = Depends(get_db_connection)) ->
     
 
 @app.get("/api/v1/leaderboard")
-def leaderboard(conn: sqlite3.Connection = Depends(get_db_connection)) -> Dict[str, List[Dict]]:
+def leaderboard(conn: sqlite3.Connection = Depends(get_db_connection)) -> dict[str, list[dict]]:
     cursor: sqlite3.Cursor = conn.cursor()
     
     # Top 5 perception
     cursor.execute("SELECT * FROM stocks ORDER BY perception DESC LIMIT 5")
-    top_5_perception: List[Tuple] = cursor.fetchall()
+    top_5_perception: list[tuple] = cursor.fetchall()
 
     # Bottom 5 perception
     cursor.execute("SELECT * FROM stocks ORDER BY perception ASC LIMIT 5")
-    bottom_5_perception: List[Tuple] = cursor.fetchall()
+    bottom_5_perception: list[tuple] = cursor.fetchall()
 
     # Top 5 overall rating
     cursor.execute("SELECT * FROM stocks ORDER BY overall_rating DESC LIMIT 5")
-    top_5_overall_rating: List[Tuple] = cursor.fetchall()
+    top_5_overall_rating: list[tuple] = cursor.fetchall()
 
     if cursor.description:
-        column_names: List[str] = [column[0] for column in cursor.description]
+        column_names: list[str] = [column[0] for column in cursor.description]
     else:
         return ResponseModel(success=False, message="500: Failed to get column names from the database")
 
-    data: Dict[str, List[Dict]] = {
+    data: dict[str, list[dict]] = {
         "success": True,
         "top_5_perception": [dict(zip(column_names, row)) for row in top_5_perception],
         "bottom_5_perception": [dict(zip(column_names, row)) for row in bottom_5_perception],

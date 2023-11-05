@@ -1,100 +1,113 @@
-from typing import List, Dict
+import datetime
 from stock import Stock
-import yfinance as yf
 import pandas as pd
-import sqlite3
-import concurrent.futures
+from mongo import Mongo
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-DATABASE_NAME = "local.db"
-TABLE_NAME = "stocks"
-
+DATABASE_NAME = "stock_database"
+COLLECTION_NAME = "stocks"
 
 class Scraper:
 
     @classmethod
-    def populate_database(cls, overwrite: bool=False) -> bool:
-        tickers: List[str] = cls._get_sp500_tickers()
-        fields: Dict[str, str] = {
-            "ticker": "TEXT PRIMARY KEY",
-            "name": "TEXT",
-            "market_cap": "FLOAT",
-            "description": "TEXT",
-            "similar": "TEXT",
-            "current_price": "FLOAT",
-            "growth": "TEXT",
-            "recommend": "TEXT",
-            "blurb": "TEXT",
-            "logo_url": "TEXT",
-            "analyst_count": "INT",
-            "perception": "FLOAT",
-            "popularity": "INT",
-            "overall_rating": "FLOAT",
-            "titles": "TEXT"
-        }
+    def populate_database(cls, overwrite: bool = False) -> bool:
+        tickers: list[tuple[str, str]] = cls.get_sp500_tickers_and_industries()
+        top_10_sp500_tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "JNJ", "UNH", "META", "V"]
+        tickers = [ticker for ticker in tickers if ticker[0] in top_10_sp500_tickers]
 
-        # Connect to the SQLite database
-        conn: sqlite3.Connection = sqlite3.connect(DATABASE_NAME)
+        # if overwrite:
+        #     Mongo.drop()
 
-        # Create a table if it doesn't exist
-        create_table_sql = f"CREATE TABLE IF NOT EXISTS {TABLE_NAME} ({','.join([f'{name} {value}' for name, value in fields.items()])})"
-        conn.execute(create_table_sql)
-        conn.commit()
-        conn.close()
-
-        def process_ticker(ticker: str) -> None:
-            conn: sqlite3.Connection = sqlite3.connect(DATABASE_NAME) # Threads!
-            if not overwrite and conn.execute(f"SELECT * FROM {TABLE_NAME} WHERE ticker = ?", (ticker,)).fetchone():
+        def process_ticker(ticker: str, industry: str, sub_industry: str) -> None:
+            if not overwrite and Mongo.collection.find_one({"ticker": ticker}):
                 return
-            try:
-                cls.send_to_database(ticker, conn)
-            except Exception as e:
-                print(e)
-                print(f"Unable to write stock info for {ticker}")
-
-        # with concurrent.futures.ThreadPoolExecutor() as executor:
-        #     executor.map(process_ticker, tickers)
-        for ticker in tickers:
-            process_ticker(ticker)
+            # try:
+            cls.send_to_database(ticker, industry, sub_industry)
+            # except Exception as e:
+            #     print(e)
+            #     print(f"Unable to write stock info for {ticker}")
+        
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            future_to_ticker = {executor.submit(process_ticker, ticker, industry, sub_industry): ticker for ticker, industry, sub_industry in tickers}
             
+            for future in as_completed(future_to_ticker):
+                ticker = future_to_ticker[future]
+                try:
+                    future.result()
+                except Exception as exc:
+                    print(f"{ticker} generated an exception: {exc}")
+
         return True
 
     @classmethod
-    def send_to_database(cls, stock_ticker: str, conn: sqlite3.Connection) -> None:
+    def send_to_database(cls, stock_ticker: str, industry: str, sub_industry: str) -> None:
         stock: Stock = Stock(stock_ticker)
         stock.populate()
-        conn.execute(
-            f"INSERT OR REPLACE INTO {TABLE_NAME} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-            (
-                stock_ticker,
-                stock.name,
-                stock.market_cap,
-                stock.description,
-                str(stock.similar),
-                stock.current_price,
-                stock.growth,
-                stock.recommend,
-                stock.blurb,
-                stock.logo,
-                stock.analyst_count,
-                stock.perception,
-                stock.popularity,
-                stock.overall_rating,
-                str(stock.titles)
-            )
-        )
-        conn.commit()
-        conn.close()
+        print(stock_ticker)
+        
+        historical_data: list = stock.stock_history
+        closing_prices = historical_data["indicators"]["adjclose"][0]["adjclose"]
+        volumes = historical_data["indicators"]["quote"][0]["volume"]
+
+        start_date = datetime.datetime(2022, 11, 1)
+        end_date = datetime.datetime(2023, 11, 1)
+        
+        current_date = start_date
+        stock_analysis = []
+        while current_date < end_date:
+            print(f"Current date: {current_date}")
+            temp_analysis = stock.perform_analysis(needs_blurb=True, month=current_date.month, year=current_date.year)
+            stock_analysis.append({
+                "perception": temp_analysis["perception"],
+                "popularity": temp_analysis["popularity"],
+                "overall_rating": temp_analysis["overall_rating"],
+            })
+            
+
+            current_date += datetime.timedelta(days=31)
+
+        stock_info = {
+            "ticker": stock_ticker,
+            "name": stock.name,
+            "industry": industry,
+            "sub_industry": sub_industry,
+
+            "stock_info": {
+                "market_cap": stock.market_cap,
+                "description": stock.description,
+                "similar": stock.similar,
+                "current_price": stock.current_price,
+                "growth": stock.growth,
+                "recommend": stock.recommend,
+                "blurb": stock.blurb,
+                "logo_url": stock.logo,
+                "analyst_count": stock.analyst_count,
+                "perception": stock.perception,
+                "popularity": stock.popularity,
+                "overall_rating": stock.overall_rating,
+                "titles": stock.titles,
+            },
+
+            "history": {
+                "closing_prices": closing_prices[:12],
+                "volumes": volumes[:12],
+                "stock_analysis": stock_analysis[:12]
+            }
+        }
+        Mongo.collection.replace_one({"ticker": stock_ticker}, stock_info, upsert=True)
 
     @classmethod
-    def _get_sp500_tickers(cls) -> List[str]:
-        table: pd.DataFrame = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
-        
-        tickers: List[str] = table['Symbol'].tolist()
-        import random
-        random.shuffle(tickers)
+    def get_sp500_tickers_and_industries(cls) -> list[tuple[str, str, str]]:
+        table: pd.DataFrame = pd.read_html('https://en.wikipedia.org/wiki/list_of_S%26P_500_companies')
+        table = table[0]
+        ticker_info: list[tuple[str, str, str]] = list(zip(table['Symbol'], table['GICS Sector'], table['GICS Sub-Industry']))
 
-        return tickers[:10]
+        return ticker_info
+
+    @classmethod
+    def get_stocks_by_industry(cls, industry: str) -> list[dict]:
+        cursor = cls.collection.find({"industry": industry})
+        return list(cursor)
 
 if __name__ == "__main__":
-    tickers = Scraper.populate_database(overwrite=False)
-    print(tickers)
+    Scraper.populate_database(overwrite=False)
