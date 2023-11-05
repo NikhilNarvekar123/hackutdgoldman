@@ -1,6 +1,4 @@
 import sqlite3
-from scraper import Scraper
-
 
 from fastapi import FastAPI, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,13 +22,6 @@ app.add_middleware(
 @app.get("/", response_model=ResponseModel)
 async def default():
     return ResponseModel(success=True, message={"Routes": "/api/v1/scraper, /api/v1/stock, /api/v1/leaderboard"})
-
-
-@app.post("/api/v1/scraper")
-def scraper() -> dict[str, bool]:
-    populated: bool = Scraper.populate_database()
-    return ResponseModel(success=True, message={"success": populated})
-
 
 def get_db_connection():
     conn = sqlite3.connect("local.db")
