@@ -16,3 +16,5 @@ class Config:
     REDDIT_PASSWORD = os.getenv('REDDIT_PASSWORD')
     REDDIT_APP_ID = os.getenv('REDDIT_APP_ID')
     REDDIT_APP_SECRET = os.getenv('REDDIT_APP_SECRET')
+
+    FRED_API_KEY = os.getenv('FRED_API_KEY')

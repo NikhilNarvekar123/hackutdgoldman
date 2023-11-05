@@ -5,17 +5,27 @@ from util.config import Config
 MONGO_URI = Config.MONGO_URI
 
 DATABASE_NAME = "stock_database"
-COLLECTION_NAME = "stocks"
+COLLECTIONS = {
+    "STOCKS": "stocks",
+    "ECONOMICS": "econ",
+    "EARNINGS": "earnings",
+}
 
 class Mongo:
     client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
     db = client[DATABASE_NAME]
-    collection = db[COLLECTION_NAME]
+    stock_collection = db[COLLECTIONS["STOCKS"]]
+    econ_collection = db[COLLECTIONS["ECONOMICS"]]
+    earnings_collection = db[COLLECTIONS["EARNINGS"]]
 
     @classmethod
     def drop(cls) -> bool:
-        cls.collection.drop()
+        # cls.earnings_collection.drop()
         return True
+    
+    def get_ticker_dict(self, ticker: str) -> dict[str, any]:
+        return self.collection.find_one({"ticker": ticker})
+    
     
     @classmethod
     def poll(cls) -> None:

@@ -1,25 +1,29 @@
+import os
+import sys
 import datetime
-from stock import Stock
 import pandas as pd
+
+sys.path.append(os.path.realpath('..'))
+from stock import Stock
 from mongo import Mongo
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 DATABASE_NAME = "stock_database"
 COLLECTION_NAME = "stocks"
 
-class Scraper:
+class StockScraper:
 
     @classmethod
     def populate_database(cls, overwrite: bool = False) -> bool:
         tickers: list[tuple[str, str]] = cls.get_sp500_tickers_and_industries()
         top_10_sp500_tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "JNJ", "UNH", "META", "V"]
-        tickers = [ticker for ticker in tickers if ticker[0] in top_10_sp500_tickers]
+        # tickers = [ticker for ticker in tickers if ticker[0] in top_10_sp500_tickers]
 
         # if overwrite:
         #     Mongo.drop()
 
         def process_ticker(ticker: str, industry: str, sub_industry: str) -> None:
-            if not overwrite and Mongo.collection.find_one({"ticker": ticker}):
+            if not overwrite and Mongo.stock_collection.find_one({"ticker": ticker}):
                 return
             # try:
             cls.send_to_database(ticker, industry, sub_industry)
@@ -94,7 +98,7 @@ class Scraper:
                 "stock_analysis": stock_analysis[:12]
             }
         }
-        Mongo.collection.replace_one({"ticker": stock_ticker}, stock_info, upsert=True)
+        Mongo.stock_collection.replace_one({"ticker": stock_ticker}, stock_info, upsert=True)
 
     @classmethod
     def get_sp500_tickers_and_industries(cls) -> list[tuple[str, str, str]]:
@@ -104,10 +108,7 @@ class Scraper:
 
         return ticker_info
 
-    @classmethod
-    def get_stocks_by_industry(cls, industry: str) -> list[dict]:
-        cursor = cls.collection.find({"industry": industry})
-        return list(cursor)
 
 if __name__ == "__main__":
-    Scraper.populate_database(overwrite=False)
+    # StockScraper.populate_database(overwrite=False)
+    pass
