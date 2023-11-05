@@ -363,9 +363,11 @@ On the positive side, the Information Technology industry is the hottest industr
 				<Input w="100%" placeholder="Enter company name..." value={inValue} onChange={(e) => {setInValue(e.target.value)}}></Input>
 					:
 				<Select placeholder='Select Category' value={dropdownValue} onChange={(e) => (setddValue(e.target.value))}>
-  					<option value='option1'>Cat1</option>
-  					<option value='option2'>Cat2</option>
-  					<option value='option3'>Cat3</option>
+  					<option value={topInd[0].industry}>{topInd[0].industry}</option>
+  					<option value={topInd[1].industry}>{topInd[1].industry}</option>
+  					<option value={topInd[2].industry}>{topInd[2].industry}</option>
+            <option value={topInd[3].industry}>{topInd[3].industry}</option>
+            <option value={topInd[4].industry}>{topInd[4].industry}</option>
 				</Select>
 				}
 

@@ -231,6 +231,7 @@ const Company = () => {
 
     const location = useLocation();
     const name = location.state?.category || "AAPL";
+    console.log(location)
 	
     const [isChecked, setIsChecked] = useState(true);
     const toggleSwitch = () => {
