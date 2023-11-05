@@ -5,10 +5,11 @@ import Navbar from './Navbar';
 import { useState, useEffect } from "react";
 import {ArrowUpIcon, ArrowDownIcon, CheckIcon, CloseIcon} from '@chakra-ui/icons';
 import { CircularProgressLabel, CircularProgress } from "@chakra-ui/react";
+import axios from 'axios'
+import { useLocation } from 'react-router-dom';
 
 
-
-const data = {
+const data2 = {
     "_id": {
       "$oid": "654701cde538840771abf6d7"
     },
@@ -154,9 +155,6 @@ const data = {
     }
 }
 
-//   console.log(data)
-
-
 
 const Card = (props) => {
     return (
@@ -229,10 +227,10 @@ const GraphCard = (props) => {
     )
 }
 
-
-
-
 const Company = () => {
+
+    const location = useLocation();
+    const name = location.state?.category || "AAPL";
 	
     const [isChecked, setIsChecked] = useState(true);
     const toggleSwitch = () => {
@@ -244,7 +242,24 @@ const Company = () => {
     const [stocks, setStocks] = useState([]);
     const [sources, setSources] = useState([]);
 
+    const [data, setStockData] = useState(null); // change all instances of data to stockData (the fetched api)
+
     useEffect(() => {
+        const apiUrl = `http://127.0.0.1:8080/api/stock/?ticker=`;
+        axios.get(apiUrl + name)
+          .then(response => {
+            // Set the state to the response data
+            setStockData(response.data['message']['stock']);
+            console.log(response.data['message']['stock']);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      }, [name]);
+
+    useEffect(() => {
+
+        if (data != null) {
         let stock_analysis = data['history']['stock_analysis'];
         // Loop through the array of objects
         const abbreviatedMonths = [
@@ -309,7 +324,8 @@ const Company = () => {
             )
         });
         setSources(tempState);
-    }, [])
+        }
+    }, [data])
 
     // const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
     const randomBaseScore = -40;
@@ -338,6 +354,9 @@ const Company = () => {
             spacing={{ base: 8}}
             py={{ base: 20, md: 28 }}>
                 
+                {data &&
+                <>
+
                 <Box
                     bgGradient="linear(to-b, blue.500, blue.700)"
                     borderWidth="2px"
@@ -347,35 +366,34 @@ const Company = () => {
                     textAlign="center"
                     w="100%"
                 >
-    <Flex justifyContent="space-between" alignItems="center">
-        <Flex direction="column" alignItems="center" ml={4} p={4}>
-            <Avatar size="lg" />
-            <Box mt={4} textAlign="center" marginBottom={8}>
-            <Text fontSize={{base: 'xl'}} fontWeight={"bold"}>{data['name']}</Text>
-            <Text>{data['stock_info']['recommend'] != "none" ? (data['stock_info']['recommend'] == "yes" ? <><Text>Recommend&nbsp;<CheckIcon/></Text></> : <><Text>Don't Recommend&nbsp;<CloseIcon/></Text></>) : ""}</Text>
-            <Text>{data['industry']}</Text>
-            </Box>
-            <div mt={4}>
-                <Text>Score</Text>
-            <CircularProgress value={circScore} size="175px" marginTop={0} color={(score > 0) ? "blue.400" : "red.400"} trackColor="gray.400" >
-            <CircularProgressLabel fontSize={"35"}>{score}%</CircularProgressLabel>
-                                </CircularProgress>
-            </div>
-  </Flex>
-  <Flex flexDirection="column" alignItems="center" ml={-4}>
-    <Scores
-      score1={data['stock_info']['popularity']}
-      barUp1={(data['history']['stock_analysis'][11]['popularity'] - data['history']['stock_analysis'][0]['popularity']) > 0}
-      score2={data['stock_info']['perception']}
-      barUp2={(data['history']['stock_analysis'][11]['perception'] - data['history']['stock_analysis'][0]['perception']) > 0}
-      score3={data['stock_info']['overall_rating']}
-      barUp3={(data['history']['stock_analysis'][11]['overall_rating'] - data['history']['stock_analysis'][0]['overall_rating']) > 0}
-      score4={randomBaseScore}
-      barUp4={(randomBaseScore > 50)}
-    />
-  </Flex>
-</Flex>
-
+                    <Flex justifyContent="space-between" alignItems="center">
+                        <Flex direction="column" alignItems="center" ml={4} p={4}>
+                            <Avatar size="lg" />
+                            <Box mt={4} textAlign="center" marginBottom={8}>
+                            <Text fontSize={{base: 'xl'}} fontWeight={"bold"}>{data['name']}</Text>
+                            <Text>{data['stock_info']['recommend'] != "none" ? (data['stock_info']['recommend'] == "buy" ? <><Text>Recommend&nbsp;<CheckIcon/></Text></> : <><Text>Don't Recommend&nbsp;<CloseIcon/></Text></>) : ""}</Text>
+                            <Text>{data['industry']}</Text>
+                            </Box>
+                            <div mt={4}>
+                                <Text>Score</Text>
+                            <CircularProgress value={circScore} size="175px" marginTop={0} color={(score > 0) ? "blue.400" : "red.400"} trackColor="gray.400" >
+                            <CircularProgressLabel fontSize={"35"}>{score}%</CircularProgressLabel>
+                                                </CircularProgress>
+                            </div>
+                    </Flex>
+                    <Flex flexDirection="column" alignItems="center" ml={-4}>
+                        <Scores
+                        score1={data['stock_info']['popularity']}
+                        barUp1={(data['history']['stock_analysis'][11]['popularity'] - data['history']['stock_analysis'][0]['popularity']) > 0}
+                        score2={data['stock_info']['perception']}
+                        barUp2={(data['history']['stock_analysis'][11]['perception'] - data['history']['stock_analysis'][0]['perception']) > 0}
+                        score3={data['stock_info']['overall_rating']}
+                        barUp3={(data['history']['stock_analysis'][11]['overall_rating'] - data['history']['stock_analysis'][0]['overall_rating']) > 0}
+                        score4={randomBaseScore}
+                        barUp4={(randomBaseScore > 50)}
+                        />
+                    </Flex>
+                    </Flex>
                 </Box>
 
 				<Flex alignItems="center">
@@ -411,14 +429,14 @@ const Company = () => {
                         <Card metricName={"Stock Information"} custom={
                             <Flex align="center" flexDirection="column">
                                 <Heading
-                                    color={useColorModeValue('gray.700', 'white')}
+                                    color={'gray.700', 'white'}
                                     fontSize={'2xl'}
                                     fontFamily={'body'}
                                 >
                                     Current Stock Price
                                 </Heading>
                                 <Heading
-                                color={useColorModeValue('gray.700', 'white')}
+                                color={'gray.700', 'white'}
                                 fontSize={'2xl'}
                                 fontFamily={'body'}
                                 textColor={data['stock_info']['growth'] < 0 ? "red.400" : "green.400"}
@@ -430,19 +448,19 @@ const Company = () => {
                                 <br/>
 
                                 <Heading
-                                    color={useColorModeValue('gray.700', 'white')}
+                                    color={'gray.700', 'white'}
                                     fontSize={'2xl'}
                                     fontFamily={'body'}
                                 >
                                     Current Market Cap
                                 </Heading>
                                 <Heading
-                                color={useColorModeValue('gray.700', 'white')}
+                                color={'gray.700', 'white'}
                                 fontSize={'2xl'}
                                 fontFamily={'body'}
                                 textColor="blue.400"
                                 >
-                                ${data['stock_info']['market_cap']['$numberLong']}
+                                ${data['stock_info']['market_cap']}
                                 </Heading>
                             </Flex>
                         }
@@ -508,12 +526,6 @@ const Company = () => {
                     
 
 
-
-
-
-
-
-
                 <Grid templateColumns={'repeat(2, 1fr)'} gap={6} w="100%" visibility={!isChecked ? "visible" : "hidden"}>
 
                     <Flex flexDirection="column">
@@ -526,14 +538,14 @@ const Company = () => {
                         <Card metricName={"Stock Information"} custom={
                             <Flex align="center" flexDirection="column">
                                 <Heading
-                                    color={useColorModeValue('gray.700', 'white')}
+                                    color={'white'}
                                     fontSize={'2xl'}
                                     fontFamily={'body'}
                                 >
                                     Current Stock Price
                                 </Heading>
                                 <Heading
-                                color={useColorModeValue('gray.700', 'white')}
+                                color={'white'}
                                 fontSize={'2xl'}
                                 fontFamily={'body'}
                                 textColor={data['stock_info']['growth'] < 0 ? "red.400" : "green.400"}
@@ -545,19 +557,19 @@ const Company = () => {
                                 <br/>
 
                                 <Heading
-                                    color={useColorModeValue('gray.700', 'white')}
+                                    color={'white'}
                                     fontSize={'2xl'}
                                     fontFamily={'body'}
                                 >
                                     Current Market Cap
                                 </Heading>
                                 <Heading
-                                color={useColorModeValue('gray.700', 'white')}
+                                color={'white'}
                                 fontSize={'2xl'}
                                 fontFamily={'body'}
                                 textColor="blue.400"
                                 >
-                                ${data['stock_info']['market_cap']['$numberLong']}
+                                ${data['stock_info']['market_cap']}
                                 </Heading>
                             </Flex>
                         }
@@ -643,6 +655,8 @@ const Company = () => {
 
                 </Grid>
 
+                </>
+                }
                 
         </Stack>
         </Container>

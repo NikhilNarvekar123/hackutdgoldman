@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "./DataTable.tsx";
 import axios from 'axios';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // const data = [
 // 	{
@@ -63,6 +64,18 @@ function App() {
 		setIsChecked(!isChecked);
 	};
 
+
+	// const [show, setShow] = useState(false)
+	// let audio = new Audio("/PATH")
+
+	// useEffect(() => {
+	// 	const timeout = setTimeout(() => {
+	// 		audio.play();
+	// 	}, 5000)
+	// 	return () => clearTimeout(timeout)
+	// }, [show])
+
+
 	const onSubmit = () => {
 		if(isChecked) {
 			if (dropdownValue.length == 0) {
@@ -83,22 +96,25 @@ function App() {
   const [lowLeaderboard, setLowLeaderBoard] = useState([])
   const [cols, setCols] = useState([])
   const [lowCols, setLowCols] = useState([])
+  const [topInd, setTopInd] = useState([])
+  const [topCols, setTopCols] = useState([])
+  const [econData, setEconData] = useState(null)
 
   function makeTable(leaderboardData) {
     let data = [];
   let lowData = [];
-  for (var i = 0; i < leaderboardData['message']['highest_rated_stocks'].length; i++) {
-    data.push({name: leaderboardData['message']['highest_rated_stocks'][i]['name'], 
-    perception: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['perception'],
-    rating: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']
+  for (var i = 0; i < leaderboardData['data']['message']['highest_rated_stocks'].length; i++) {
+    data.push({name: leaderboardData['data']['message']['highest_rated_stocks'][i]['name'], 
+    perception: leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['perception'],
+    rating: leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']
   });
   
-  lowData.push({name: leaderboardData['message']['lowest_rated_stocks'][i]['name'], 
-    perception: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
-    rating: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
+  lowData.push({name: leaderboardData['data']['message']['lowest_rated_stocks'][i]['name'], 
+    perception: leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
+    rating: leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
   });
-  
   }
+
   const columns = [
     columnHelper.accessor("name", {
       cell: (info) => info.getValue(),
@@ -148,11 +164,13 @@ function App() {
   }
 
   useEffect(() => {
-    fetchLeaderboardData()
+    fetchLeaderboardData();
+    fetchEconData();
+    fetchIndusData();
   })
 
   const fetchLeaderboardData = async () => {
-    const apiUrl = `http://127.0.0.1:8080/api/v1/leaderboard`;
+    const apiUrl = `http://localhost:8080/api/stock_leaderboard`;
     axios
     .get(apiUrl)
     .then((response) => {
@@ -161,6 +179,114 @@ function App() {
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
+
+  const fetchEconData = async () => {
+    const apiUrl = `http://localhost:8080/api/get_econ_info`;
+    axios
+    .get(apiUrl)
+    .then((response) => {
+      console.log("econ", response);
+      setEconData(response.data)
+    }).catch((error) => 
+     console.error('Error fetching data:', error));
+  }
+  
+
+  const fetchIndusData = async () => {
+    const apiUrl = `http://localhost:8080/api/top_industries`;
+    axios
+    .get(apiUrl)
+    .then((response) => {
+      console.log("industries", response.data)
+      let inData = []
+      for (var i = 0; i < response.data['message']['top_industries'].length; i++) {
+        inData.push({
+          industry: response.data['message']['top_industries'][i]['industry'],
+          perception: response.data['message']['top_industries'][i]['perceptions'],
+          rating: response.data['message']['top_industries'][i]['overall_rating'],
+        })
+      }
+      const columns = [
+        columnHelper.accessor("industry", {
+          cell: (info) => info.getValue(),
+          header: "Industry",
+        }),
+        columnHelper.accessor("perception", {
+          cell: (info) => info.getValue(),
+          header: "Perception",
+          meta: {
+            isNumeric: true
+          }
+        }),
+        columnHelper.accessor("rating", {
+          cell: (info) => info.getValue(),
+          header: "Rating",
+          meta: {
+          isNumeric: true,
+          },
+        }),
+      ];
+      setTopInd(inData)
+      setTopCols(columns)
+
+    }).catch((error) => 
+     console.error('Error fetching data:', error));
+  }
+
+  const [ppiArr, setPpiArr] = useState([])
+  const [csArr, setCsArr] = useState([])
+  const [fsArr, setFsArr] = useState([])
+  const [snp, setSnp] = useState([])
+  useEffect(() => {
+	if(econData) {
+    // Loop through the array of objects
+    const abbreviatedMonths = [
+        "Dec", "Jan", "Feb", "Mar", "Apr", "May",
+        "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"
+    ];
+    let ppi_data = econData['message']['producer_price_index']['data'];
+    let idx = 0;
+    let newArr = [];
+    ppi_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr.push({name: abbreviatedMonths[idx], ppi: item});
+        idx += 1;
+    });
+    setPpiArr(newArr);
+
+    let cs_data = econData['message']['consumer_sentiment']['data'];
+    let idx1 = 0;
+    let newArr1 = [];
+    cs_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr.push({name: abbreviatedMonths[idx1], cs: item});
+        idx1 += 1;
+    });
+    setCsArr(newArr1)
+
+    let fs_data = econData['message']['financial_stress']['data'];
+    let idx2 = 0;
+    let newArr2 = [];
+    fs_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr2.push({name: abbreviatedMonths[idx2], fs: item});
+        idx2 += 1;
+    });
+    setFsArr(newArr2)
+
+    let snp_data = econData['message']['snp500']['data'];
+    let idx3 = 0;
+    let newArr3 = [];
+    snp_data.forEach((item) => {
+        // Extract and push the values of the fields into their respective arrays
+        newArr3.push({name: abbreviatedMonths[idx], snp: item});
+        idx3 += 1;
+    });
+    setSnp(newArr3)
+	}
+
+    }, [econData])
+  
 
   return (
     <Container maxW={'5xl'}>
@@ -173,7 +299,7 @@ function App() {
 				fontWeight={600}
 				fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }}
 				lineHeight={'110%'}>
-				StockSentinel{' '}
+				GoldMine{' '}
 				<br/>
 				<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 					stock sentiment analysis, recommendation, and comparison
@@ -241,6 +367,55 @@ function App() {
 				Lowest Rated Stocks
 			</Text>
 			<DataTable columns={lowCols} data={lowLeaderboard} />
+
+      <Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
+				Top Industries
+			</Text>
+			<DataTable columns={topCols} data={topInd} />
+
+      <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={ppiArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="ppi" name="Producer Price Index" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+
+      <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+          <LineChart isAnimationActive={false} data={csArr}>
+              <CartesianGrid stroke="#ccc" fill="white"/>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" isAnimationActive={false} dataKey="cs" name="Consumer Sentiment" stroke="#8884d8" />
+          </LineChart>
+      </ResponsiveContainer>
+
+      <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={fsArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="fs" name="Financial Stress" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+
+    <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+        <LineChart isAnimationActive={false} data={snp}>
+            <CartesianGrid stroke="#ccc" fill="white"/>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" isAnimationActive={false} dataKey="snp" name="snp500" stroke="#8884d8" />
+        </LineChart>
+    </ResponsiveContainer>
       
 	</Stack>
     </Container>
