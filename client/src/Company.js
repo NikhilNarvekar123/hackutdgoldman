@@ -4,6 +4,7 @@ import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, use
 import Navbar from './Navbar';
 import { useState, useEffect } from "react";
 import {ArrowUpIcon, ArrowDownIcon} from '@chakra-ui/icons';
+import { CircularProgressLabel, CircularProgress } from "@chakra-ui/react";
 
 
 
