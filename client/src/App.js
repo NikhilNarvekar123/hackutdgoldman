@@ -186,9 +186,9 @@ function App() {
       let inData = []
       for (var i = 0; i < response.data['message']['top_industries'].length; i++) {
         inData.push({
-          industry: response.data['message']['top_industries'][i]['history']['industry'],
-          perception: response.data['message']['top_industries'][i]['history']['perception'],
-          rating: response.data['message']['top_industries'][i]['history']['overall_rating'],
+          industry: response.data['message']['top_industries'][i]['industry'],
+          perception: response.data['message']['top_industries'][i]['perceptions'],
+          rating: response.data['message']['top_industries'][i]['overall_rating'],
         })
       }
       const columns = [
