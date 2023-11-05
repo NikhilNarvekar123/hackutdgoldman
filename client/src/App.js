@@ -13,43 +13,44 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "./DataTable.tsx";
 import axios from 'axios';
 
-const data = [
-	{
-	  fromUnit: "Google",
-	  toUnit: "80",
-	  factor: 25.4,
-	},
-	{
-	  fromUnit: "Datadog",
-	  toUnit: "70",
-	  factor: 30.48,
-	},
-	{
-	  fromUnit: "Whatnot",
-	  toUnit: "19",
-	  factor: 0.91444,
-	},
-];
+// const data = [
+// 	{
+// 	  fromUnit: "Google",
+// 	  toUnit: "80",
+// 	  factor: 25.4,
+// 	},
+// 	{
+// 	  fromUnit: "Datadog",
+// 	  toUnit: "70",
+// 	  factor: 30.48,
+// 	},
+// 	{
+// 	  fromUnit: "Whatnot",
+// 	  toUnit: "19",
+// 	  factor: 0.91444,
+// 	},
+// ];
 
 const columnHelper = createColumnHelper();
 
-const columns = [
-	columnHelper.accessor("fromUnit", {
-	  cell: (info) => info.getValue(),
-	  header: "Company",
-	}),
-	columnHelper.accessor("toUnit", {
-	  cell: (info) => info.getValue(),
-	  header: "Sentiment",
-	}),
-	columnHelper.accessor("factor", {
-	  cell: (info) => info.getValue(),
-	  header: "Rank",
-	  meta: {
-		isNumeric: true,
-	  },
-	}),
-];
+// const columns = [
+// 	columnHelper.accessor("fromUnit", {
+// 	  cell: (info) => info.getValue(),
+// 	  header: "Company",
+// 	}),
+// 	columnHelper.accessor("toUnit", {
+// 	  cell: (info) => info.getValue(),
+// 	  header: "Sentiment",
+// 	}),
+// 	columnHelper.accessor("factor", {
+// 	  cell: (info) => info.getValue(),
+// 	  header: "Rank",
+// 	  meta: {
+// 		isNumeric: true,
+// 	  },
+// 	}),
+// ];
+
 
 function App() {
 
@@ -79,15 +80,76 @@ function App() {
 	}
 
   const [leaderboard, setLeaderboard] = useState([])
+  const [lowLeaderboard, setLowLeaderBoard] = useState([])
+  const [cols, setCols] = useState([])
+  const [lowCols, setLowCols] = useState([])
+
+  function makeTable(leaderboardData) {
+    let data = [];
+  let lowData = [];
+  for (var i = 0; i < leaderboardData['message']['highest_rated_stocks'].length; i++) {
+    data.push({name: leaderboardData['message']['highest_rated_stocks'][i]['name'], 
+    perception: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['perception'],
+    rating: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']
+  });
+  
+  lowData.push({name: leaderboardData['message']['lowest_rated_stocks'][i]['name'], 
+    perception: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
+    rating: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
+  });
+  
+  }
+  const columns = [
+    columnHelper.accessor("name", {
+      cell: (info) => info.getValue(),
+      header: "Company",
+    }),
+    columnHelper.accessor("perception", {
+      cell: (info) => info.getValue(),
+      header: "Perception",
+      meta: {
+        isNumeric: true
+      }
+    }),
+    columnHelper.accessor("rating", {
+      cell: (info) => info.getValue(),
+      header: "Rating",
+      meta: {
+      isNumeric: true,
+      },
+    }),
+  ];
+  
+  const lowColumns = [
+    columnHelper.accessor("name", {
+      cell: (info) => info.getValue(),
+      header: "Company",
+    }),
+    columnHelper.accessor("perception", {
+      cell: (info) => info.getValue(),
+      header: "Perception",
+      meta: {
+        isNumeric: true
+      }
+    }),
+    columnHelper.accessor("rating", {
+      cell: (info) => info.getValue(),
+      header: "Rating",
+      meta: {
+      isNumeric: true,
+      },
+    }),
+  ];
+  
+    setLeaderboard(data)
+    setLowLeaderBoard(lowData)
+    setCols(columns)
+    setLowCols(lowColumns)
+  }
 
   useEffect(() => {
     fetchLeaderboardData()
   })
-
-  // { top_5_perception: [{}, {}]
-//  bottom_5_perception
-// top_5_overall_rating
-// }
 
   const fetchLeaderboardData = async () => {
     const apiUrl = `http://127.0.0.1:8080/api/v1/leaderboard`;
@@ -95,7 +157,7 @@ function App() {
     .get(apiUrl)
     .then((response) => {
       console.log("leaderboard", response)
-      setLeaderboard(response)
+      makeTable(response)
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
@@ -169,16 +231,16 @@ function App() {
 			<br/>
 
 			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
-				Top Companies
+				Highest Rated Stocks
 			</Text>
-			<DataTable columns={columns} data={data} />
+			<DataTable columns={cols} data={leaderboard} />
 
 			<br/>
 
 			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
-				Top Categories
+				Lowest Rated Stocks
 			</Text>
-			<DataTable columns={columns} data={data} />
+			<DataTable columns={lowCols} data={lowLeaderboard} />
       
 	</Stack>
     </Container>
