@@ -83,13 +83,13 @@ function App() {
 			if (dropdownValue.length == 0) {
 				setErr(true);
 			} else {
-				navigate('/loading', {state: {category: dropdownValue}});
+				navigate('/loading', {state: {category: dropdownValue, isCategory: true}});
 			}
 		} else {
 			if (inValue.length == 0) {
 				setErr(true);
 			} else {
-				navigate('/loading', {state: {category: dropdownValue}});
+				navigate('/loading', {state: {category: inValue, isCategory: false}});
 			}
 		}
 	}

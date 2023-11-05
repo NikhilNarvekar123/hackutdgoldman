@@ -3,7 +3,7 @@ from flair.data import Sentence
 
 classifier: TextClassifier = TextClassifier.load("en-sentiment")
 
-def calculate_perception(title: str) -> float:
+def relative_calculate_perception(title: str) -> float:
     sentence: Sentence = Sentence(title)
     classifier.predict(sentence)
     label = sentence.labels[0]

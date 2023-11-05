@@ -1,18 +1,19 @@
-import os
-from typing import List, Dict
 from apiclient.discovery import build
-from sources.lib.message import Message
-import sources.lib.perception as perc
+from .lib.message import Message
+from .lib.perception import relative_calculate_perception
+from util.config import Config
 
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+YOUTUBE_API_KEY = Config.YOUTUBE_API_KEY
 
 
 class Youtube:
-    def __init__(self):
+    def __init__(self, start_time: str, end_time: str):
         self.youtube: build = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
+        self.start_time = start_time
+        self.end_time = end_time
 
     def calculate_perception(self, stock_ticker: str) -> float:
-        messages: List[Message] = self.get_messages(stock_ticker)
+        messages: list[Message] = self.get_messages(stock_ticker)
         total_sum: float = 0
         perception: float = 0
         for message in messages:
@@ -27,16 +28,16 @@ class Youtube:
         
         return perception, value
     
-    def get_messages(self, company_name: str) -> List[Message]:
-        messages: List[Message] = []
-        titles: List[str] = []
-        video_ids: List[str] = []
+    def get_messages(self, company_name: str) -> list[Message]:
+        messages: list[Message] = []
+        titles: list[str] = []
+        video_ids: list[str] = []
         titles, video_ids = self._fetch_video_titles_and_ids(f"{company_name} stock")
-        video_statistics: List[dict] = self._fetch_video_statistics(video_ids)
+        video_statistics: list[dict] = self._fetch_video_statistics(video_ids)
 
         for index, stats in enumerate(video_statistics):
             title: str = titles[index]
-            perception: float = perc.calculate_perception(title)
+            perception: float = relative_calculate_perception(title)
             popularity: int = int(stats["statistics"]["viewCount"])
 
             if "likeCount" in stats["statistics"]:
@@ -52,30 +53,31 @@ class Youtube:
             message: Message = Message(perception, popularity, "YouTube", title)
             messages.append(message)
         
-        self.top_titles: List[str] = [message.content for message in messages[-3:]]
-        self.bottom_titles: List[str] = [message.content for message in messages[:3]]
+        self.top_titles: list[str] = [message.content for message in messages[-3:]]
+        self.bottom_titles: list[str] = [message.content for message in messages[:3]]
 
         return messages
 
-    def _fetch_video_titles_and_ids(self, company_name: str) -> (List[str], List[str]):
+    def _fetch_video_titles_and_ids(self, company_name: str) -> (list[str], list[str]):
         title_request: build = self.youtube.search().list(
             q=company_name,
             part="snippet",
             type="video",
-            publishedAfter="2021-11-07T00:00:00Z",
+            publishedAfter=self.start_time,
+            publishedBefore=self.end_time,
             maxResults=100,
         )
-        response: Dict[str, List[dict]] = title_request.execute()
-        titles: List[str] = [item["snippet"]["title"] for item in response["items"]]
-        video_ids: List[str] = [item["id"]["videoId"] for item in response["items"]]
+        response: dict[str, list[dict]] = title_request.execute()
+        titles: list[str] = [item["snippet"]["title"] for item in response["items"]]
+        video_ids: list[str] = [item["id"]["videoId"] for item in response["items"]]
         return titles, video_ids
 
-    def _fetch_video_statistics(self, video_ids: List[str]) -> List[dict]:
+    def _fetch_video_statistics(self, video_ids: list[str]) -> list[dict]:
         ids_str: str = ",".join(video_ids)
         statistics_request = self.youtube.videos().list(
             id=ids_str, part="statistics", maxResults=100
         )
-        response: Dict[str, List[Dict]] = statistics_request.execute()
+        response: dict[str, list[dict]] = statistics_request.execute()
         return response["items"]
 
     @staticmethod

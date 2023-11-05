@@ -1,4 +1,4 @@
-import { Stack, Progress, ChakraProvider, Box, Heading, Container, Icon } from "@chakra-ui/react";
+import { Stack, Progress, Text, Box, Heading, Container, Icon } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 
@@ -46,7 +46,16 @@ const Scores = () => {
     <Container>
         <Stack spacing={5}>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5"}}>
+            <Box position="relative">
             <Progress color='red' value={bar1} width='sm' height='64px' alignSelf={'center'} />
+            <Text position="absolute"
+        top="50%"
+        left="50%"
+        transform="translate(-50%, -50%)"
+        zIndex="1"
+        color="white"
+        fontWeight={"bold"}>Sentiment Score</Text>
+            </Box>
             <Heading marginLeft={8} fontSize={64}> {bar1}%</Heading>
             <style>{bounceAnimation}</style>
             <Icon as={barUp1 ? MdArrowUpward : MdArrowDownward} boxSize={10} color={barUp1 ? "green.500" : "red.500"} marginLeft={4} style={{
@@ -54,7 +63,16 @@ const Scores = () => {
         }}/>
             </Box>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5" }}>
+            <Box position="relative">
             <Progress color='red' value={bar2} width='sm' height='64px' alignSelf={'center'} />
+            <Text position="absolute"
+        top="50%"
+        left="50%"
+        transform="translate(-50%, -50%)"
+        zIndex="1"
+        color="white"
+        fontWeight={"bold"}>Earnings Score</Text>
+            </Box>
             <Heading marginLeft={8} fontSize={64}> {bar2}%</Heading>
             <style>{bounceAnimation}</style>
             <Icon as={barUp2 ? MdArrowUpward : MdArrowDownward} boxSize={10} color={barUp2 ? "green.500" : "red.500"} marginLeft={4} style={{
