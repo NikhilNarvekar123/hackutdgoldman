@@ -83,10 +83,12 @@ function App() {
   const [lowLeaderboard, setLowLeaderBoard] = useState([])
   const [cols, setCols] = useState([])
   const [lowCols, setLowCols] = useState([])
+  const [topInd, setTopInd] = useState([])
+  const [topCols, setTopCols] = useState([])
 
   function makeTable(leaderboardData) {
     let data = [];
-  let lowData = [];
+    let lowData = [];
   for (var i = 0; i < leaderboardData['message']['highest_rated_stocks'].length; i++) {
     data.push({name: leaderboardData['message']['highest_rated_stocks'][i]['name'], 
     perception: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['perception'],
@@ -97,8 +99,8 @@ function App() {
     perception: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
     rating: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
   });
-  
   }
+
   const columns = [
     columnHelper.accessor("name", {
       cell: (info) => info.getValue(),
@@ -169,7 +171,7 @@ function App() {
     axios
     .get(apiUrl)
     .then((response) => {
-      console.log("econ", response)
+      console.log("econ", response);
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
@@ -180,7 +182,38 @@ function App() {
     axios
     .get(apiUrl)
     .then((response) => {
-      console.log("industries", response)
+      console.log("industries", response.data)
+      let inData = []
+      for (var i = 0; i < response.data['message']['top_industries'].length; i++) {
+        inData.push({
+          industry: response.data['message']['top_industries'][i]['history']['industry'],
+          perception: response.data['message']['top_industries'][i]['history']['perception'],
+          rating: response.data['message']['top_industries'][i]['history']['overall_rating'],
+        })
+      }
+      const columns = [
+        columnHelper.accessor("industry", {
+          cell: (info) => info.getValue(),
+          header: "Industry",
+        }),
+        columnHelper.accessor("perception", {
+          cell: (info) => info.getValue(),
+          header: "Perception",
+          meta: {
+            isNumeric: true
+          }
+        }),
+        columnHelper.accessor("rating", {
+          cell: (info) => info.getValue(),
+          header: "Rating",
+          meta: {
+          isNumeric: true,
+          },
+        }),
+      ];
+      setTopInd(inData)
+      setTopCols(columns)
+
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
