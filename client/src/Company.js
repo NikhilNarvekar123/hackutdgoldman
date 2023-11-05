@@ -2,7 +2,7 @@ import Scores from "./Scores";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames, CircularProgress, CircularProgressLabel } from '@chakra-ui/react';
 import Navbar from './Navbar';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 
@@ -153,7 +153,7 @@ const data = {
     }
   }
 
-  console.log(data)
+//   console.log(data)
 
 
 const renderLineChart = (
@@ -218,8 +218,21 @@ const Company = () => {
 	};
 
     const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
-    const randomBaseScore = 40;
-    const score = Math.ceil(randomBaseScore*riskMultiplier);
+    const randomBaseScore = -40;
+    const score = parseFloat((randomBaseScore*riskMultiplier).toFixed(2));
+    const [circScore, setCircScore] = useState(100*(score < 0))
+    useEffect(() => {
+        const timer = setInterval(() => {
+          if (circScore < score) { // update code
+            setCircScore(circScore + 1)
+          }
+          if (score < 0 && circScore > score*-1) { // score = -11, then bar1 = 89
+            setCircScore(circScore - 1)
+          }
+          clearInterval(timer);
+        }, 20); 
+    }, [circScore, score])
+    console.log(circScore)
     return(
         <>
         
@@ -243,14 +256,15 @@ const Company = () => {
     <Flex justifyContent="space-between" alignItems="center">
         <Flex direction="column" alignItems="center" ml={4} p={4}>
             <Avatar size="lg" />
-            <Box mt={4} textAlign="center">
+            <Box mt={4} textAlign="center" marginBottom={8}>
             <Text fontSize={{base: 'xl'}} fontWeight={"bold"}>{data['name']}</Text>
             <Text>Rank</Text>
             <Text>{data['industry']}</Text>
             </Box>
             <div mt={4}>
-            <CircularProgress value={score} size="175px" marginTop={10} color="blue.400" trackColor="gray.400" >
-            <CircularProgressLabel>{score}%</CircularProgressLabel>
+                <Text>Score</Text>
+            <CircularProgress value={circScore} size="175px" marginTop={0} color={(score > 0) ? "blue.400" : "red.400"} trackColor="gray.400" >
+            <CircularProgressLabel fontSize={"35"}>{score}%</CircularProgressLabel>
                                 </CircularProgress>
             </div>
   </Flex>

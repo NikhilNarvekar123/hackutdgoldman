@@ -75,7 +75,7 @@ const Scores = ({ score1, barUp1, score2, barUp2, score3, barUp3, score4, barUp4
         <Stack spacing={5}>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5"}}>
             <Box position="relative">
-            <Progress value={bar1} width='sm' height='64px' alignSelf={'center'} bgColor={score1 < 0 ? "red" : ""}/>
+            <Progress value={bar1} width='sm' height='64px' alignSelf={'center'} bgColor={score1 < 0 ? "red" : ""} colorScheme={score1 < 2 ? "facebook" : "blue"}/>
             <Text position="absolute"
         top="50%"
         left="50%"
@@ -90,7 +90,7 @@ const Scores = ({ score1, barUp1, score2, barUp2, score3, barUp3, score4, barUp4
             </Box>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5" }}>
             <Box position="relative">
-            <Progress color='red' value={bar2} width='sm' height='64px' alignSelf={'center'} bgColor={score2 < 0 ? "red" : ""} colorScheme="facebook"/>
+            <Progress color='red' value={bar2} width='sm' height='64px' alignSelf={'center'} bgColor={score2 < 0 ? "red" : ""} colorScheme={score2 < 2 ? "facebook" : "blue"}/>
             <Text position="absolute"
         top="50%"
         left="50%"
@@ -105,7 +105,7 @@ const Scores = ({ score1, barUp1, score2, barUp2, score3, barUp3, score4, barUp4
             </Box>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5" }}>
             <Box position="relative">
-            <Progress color='red' value={bar3} width='sm' height='64px' alignSelf={'center'} bgColor={score3 < 0 ? "red" : ""}/>
+            <Progress color='red' value={bar3} width='sm' height='64px' alignSelf={'center'} bgColor={score3 < 0 ? "red" : ""} colorScheme={score3 < 2 ? "facebook" : "blue"}/>
             <Text position="absolute"
         top="50%"
         left="50%"
@@ -120,7 +120,7 @@ const Scores = ({ score1, barUp1, score2, barUp2, score3, barUp3, score4, barUp4
             </Box>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5" }}>
             <Box position="relative">
-            <Progress color='red' value={bar4} width='sm' height='64px' alignSelf={'center'} bgColor={score4 < 0 ? "red" : ""}/>
+            <Progress color='red' value={bar4} width='sm' height='64px' alignSelf={'center'} bgColor={score4 < 0 ? "red" : ""} colorScheme={score4 < 2 ? "facebook" : "blue"}/>
             <Text position="absolute"
         top="50%"
         left="50%"
