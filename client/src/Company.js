@@ -1,6 +1,6 @@
 import Scores from "./Scores";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames } from '@chakra-ui/react';
+import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames, CircularProgress, CircularProgressLabel } from '@chakra-ui/react';
 import Navbar from './Navbar';
 import { useState } from "react";
 
@@ -153,6 +153,7 @@ const data = {
     }
   }
 
+  console.log(data)
 
 
 const renderLineChart = (
@@ -206,7 +207,7 @@ const Card = (props) => {
     )
 }
 
-
+const riskMultiplier = 1.14;
 
 
 const Company = () => {
@@ -217,7 +218,8 @@ const Company = () => {
 	};
 
     const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
-
+    const randomBaseScore = 40;
+    const score = Math.ceil(randomBaseScore*riskMultiplier);
     return(
         <>
         
@@ -231,25 +233,41 @@ const Company = () => {
                 
                 <Box
                     bgGradient="linear(to-b, blue.500, blue.700)"
-                    borderWidth="1px"
+                    borderWidth="2px"
                     borderColor="blue.600"
                     borderRadius="md"
                     p={4}
                     textAlign="center"
                     w="100%"
                 >
-                    <Flex justifyContent="space-between">
-                        <Flex h={180} ml={10}>
-                            <Flex direction="column" alignItems="center" justify="center">
-                                <Avatar size="lg"/>
-                                <Box mt={2} textAlign="center">
-                                <div>Company Name</div>
-                                <div>Rank</div>
-                                </Box>
-                            </Flex>
-                        </Flex>
-                        <div><Scores score1={90} score2={85} score3={78} score4={92}/></div>
-                    </Flex>
+    <Flex justifyContent="space-between" alignItems="center">
+        <Flex direction="column" alignItems="center" ml={4} p={4}>
+            <Avatar size="lg" />
+            <Box mt={4} textAlign="center">
+            <Text fontSize={{base: 'xl'}} fontWeight={"bold"}>{data['name']}</Text>
+            <Text>Rank</Text>
+            <Text>{data['industry']}</Text>
+            </Box>
+            <div mt={4}>
+            <CircularProgress value={score} size="175px" marginTop={10} color="blue.400" trackColor="gray.400" >
+            <CircularProgressLabel>{score}%</CircularProgressLabel>
+                                </CircularProgress>
+            </div>
+  </Flex>
+  <Flex flexDirection="column" alignItems="center" ml={-4}>
+    <Scores
+      score1={data['stock_info']['popularity']}
+      barUp1={(data['history']['stock_analysis'][11]['popularity'] - data['history']['stock_analysis'][0]['popularity']) > 0}
+      score2={data['stock_info']['perception']}
+      barUp2={(data['history']['stock_analysis'][11]['perception'] - data['history']['stock_analysis'][0]['perception']) > 0}
+      score3={data['stock_info']['overall_rating']}
+      barUp3={(data['history']['stock_analysis'][11]['overall_rating'] - data['history']['stock_analysis'][0]['overall_rating']) > 0}
+      score4={randomBaseScore}
+      barUp4={(randomBaseScore > 50)}
+    />
+  </Flex>
+</Flex>
+
                 </Box>
 
 				<Flex alignItems="center">
