@@ -1,4 +1,3 @@
-import { ColorModeScript } from '@chakra-ui/react';
 import React, { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import App from './App';
@@ -9,7 +8,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react';
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
@@ -25,9 +24,16 @@ const router = createBrowserRouter([
   },
 ]);
 
+const theme = extendTheme({
+  config: {
+    initialColorMode: "dark", // Set the default color mode to "dark"
+  },
+});
+
 
 root.render(
-  <ChakraProvider>
+  <ChakraProvider theme={theme}>
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <RouterProvider router={router} />
   </ChakraProvider>
 );

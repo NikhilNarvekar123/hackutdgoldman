@@ -1,54 +1,110 @@
 import logo from './logo.svg';
 import './App.css';
 import Loading from './Loading';
-import { Text, Container, Stack, Heading, Button, Flex, Icon, IconProps } from '@chakra-ui/react';
+import { ColorModeScript, Switch, SliderTrack, SliderThumb, SliderFilledTrack, extendTheme, Box, Input, Select, Text, Container, Stack, Heading, Button, Flex, Icon, IconProps, ChakraProvider ,
+	Alert,
+	AlertIcon,
+	AlertTitle,
+	AlertDescription,
+} from '@chakra-ui/react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
-  return (
-    <div className="App">
 
+	const navigate = useNavigate();
+	const [isChecked, setIsChecked] = useState(false);
+	const [inValue, setInValue] = useState("");
+	const [dropdownValue, setddValue] = useState("");
+	const [isErr, setErr] = useState(false);
+	const toggleSwitch = () => {
+		setIsChecked(!isChecked);
+	};
+
+	const onSubmit = () => {
+		if(isChecked) {
+			if (dropdownValue.length == 0) {
+				setErr(true);
+			} else {
+				navigate('/loading', {state: {category: dropdownValue}});
+			}
+		} else {
+			if (inValue.length == 0) {
+				setErr(true);
+			} else {
+				navigate('/loading', {state: {category: dropdownValue}});
+			}
+		}
+	}
+
+
+  return (
     <Container maxW={'5xl'}>
-      <Stack
+    <Stack
         textAlign={'center'}
         align={'center'}
         spacing={{ base: 8, md: 10 }}
         py={{ base: 20, md: 28 }}>
-        <Heading
-          fontWeight={600}
-          fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }}
-          lineHeight={'110%'}>
-          Meeting scheduling{' '}
-          <Text as={'span'} color={'orange.400'}>
-            made easy
-          </Text>
-        </Heading>
-        <Text color={'gray.500'} maxW={'3xl'}>
-          Never miss a meeting. Never be late for one too. Keep track of your meetings and
-          receive smart reminders in appropriate times. Read your smart “Daily Agenda”
-          every morning.
-        </Text>
-        <Stack spacing={6} direction={'row'}>
-          <Button
-            rounded={'full'}
-            px={6}
-            colorScheme={'orange'}
-            bg={'orange.400'}
-            _hover={{ bg: 'orange.500' }}>
-            Get started
-          </Button>
-          <Button rounded={'full'} px={6}>
-            Learn more
-          </Button>
-        </Stack>
-        <Flex w={'full'}>
-          
-        </Flex>
-      </Stack>
+			<Heading
+				fontWeight={600}
+				fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }}
+				lineHeight={'110%'}>
+				StockSentinel{' '}
+				<br/>
+				<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
+					stock sentiment analysis, recommendation, and comparison
+				</Text>
+			</Heading>
+			<Text color={'gray.500'} maxW={'3xl'}>
+				Enter a company name or select a company category from the form below to get started.
+			</Text>
+
+			<br/>
+			<Container maxW="65%">
+				{!isChecked ? 
+				<Input w="100%" placeholder="Enter company name..." value={inValue} onChange={(e) => {setInValue(e.target.value)}}></Input>
+					:
+				<Select placeholder='Select Category' value={dropdownValue} onChange={(e) => (setddValue(e.target.value))}>
+  					<option value='option1'>Cat1</option>
+  					<option value='option2'>Cat2</option>
+  					<option value='option3'>Cat3</option>
+				</Select>
+				}
+
+
+				<Box h="30px" w="20px" />
+
+				<Flex justifyContent="space-between">
+
+				<Flex alignItems="center">
+					<Text fontSize="sm" mr={2}>Company Search</Text>
+					<Switch isChecked={isChecked} onChange={toggleSwitch} size="lg" colorScheme={"blue"} />
+					<Text fontSize="sm" ml={2}>Category Search</Text>
+					</Flex>
+
+
+					<Button
+					rounded={'full'}
+					px={6}
+					colorScheme={'orange'}
+					bg={'blue.300'}
+					_hover={{ bg: 'orange.500' }}
+					onClick={onSubmit}>
+					Analyze
+					</Button>
+				</Flex>
+
+				{isErr && <Alert status='error' mt={10}>
+					<AlertIcon />
+					<AlertTitle>Empty field!</AlertTitle>
+					<AlertDescription>Please enter text or choose a menu option.</AlertDescription>
+				</Alert>}
+			</Container>
+
+
+      
+	</Stack>
     </Container>
-
-
-
-    </div>
   );
 }
 
