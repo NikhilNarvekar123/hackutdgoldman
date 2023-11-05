@@ -1,9 +1,9 @@
 import Scores from "./Scores";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames } from '@chakra-ui/react';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames, Stat, StatLabel, StatNumber, StatArrow, StatHelpText } from '@chakra-ui/react';
 import Navbar from './Navbar';
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import {ArrowUpIcon, ArrowDownIcon} from '@chakra-ui/icons';
 
 
 
@@ -151,18 +151,9 @@ const data = {
         }
       ]
     }
-  }
+}
 
 
-
-const renderLineChart = (
-    <LineChart width={600} height={300} data={data}>
-    <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-    <CartesianGrid stroke="#ccc" />
-    <XAxis dataKey="name" />
-    <YAxis />
-    </LineChart>
-);
 
 
 const Card = (props) => {
@@ -193,6 +184,8 @@ const Card = (props) => {
             <Text color={'gray.500'} textAlign="left">
               {props.description}
             </Text>
+
+            {props.custom}
           </Stack>
           <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
             {props.imgSrc && <Avatar src={props.imgSrc} />}
@@ -208,15 +201,115 @@ const Card = (props) => {
 
 
 
+const GraphCard = (props) => {
+    return (
+      <Center py={6}>
+        <Box
+          w="100%"
+          bg={useColorModeValue('white', 'gray.900')}
+          boxShadow={'2xl'}
+          rounded={'md'}
+          p={6}
+          overflow={'hidden'}>
+          <Stack>
+            <Text
+              color={'green.500'}
+              textTransform={'uppercase'}
+              fontWeight={800}
+              fontSize={'sm'}
+              letterSpacing={1.1}>
+              {props.metricName}
+            </Text>
+            {props.graph}
+          </Stack>
+        </Box>
+      </Center>
+    )
+}
+
+
+
 
 const Company = () => {
 	
-    const [isChecked, setIsChecked] = useState(false);
+    const [isChecked, setIsChecked] = useState(true);
     const toggleSwitch = () => {
 		setIsChecked(!isChecked);
 	};
+    const [analysisArray, setAnalysisArr] = useState([]);
+    const [closingpriceArr, setClosingPriceArr] = useState([]);
+    const [volumeArr, setVolumeArr] = useState([]);
+    const [stocks, setStocks] = useState([]);
+    const [sources, setSources] = useState([]);
 
-    const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
+
+
+    useEffect(() => {
+        let stock_analysis = data['history']['stock_analysis'];
+        // Loop through the array of objects
+        const abbreviatedMonths = [
+            "Dec", "Jan", "Feb", "Mar", "Apr", "May",
+            "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"
+        ];
+        let idx = 0;
+        let newArr = [];
+        stock_analysis.forEach((item) => {
+            // Extract and push the values of the fields into their respective arrays
+            newArr.push({name: abbreviatedMonths[idx], perc: item.perception, pop: item.popularity, rating: item.overall_rating});
+            idx += 1;
+        });
+        setAnalysisArr(newArr);
+
+        let closingPrices = data['history']['closing_prices'];
+        let idx1 = 0;
+        let newArr1 = [];
+        closingPrices.forEach((item) => {
+            // Extract and push the values of the fields into their respective arrays
+            newArr1.push({name: abbreviatedMonths[idx1], price: item});
+            idx1 += 1;
+        });
+        setClosingPriceArr(newArr1);
+
+        let volumes = data['history']['volumes'];
+        let idx2 = 0;
+        let newArr2 = [];
+        volumes.forEach((item) => {
+            // Extract and push the values of the fields into their respective arrays
+            newArr2.push({name: abbreviatedMonths[idx2], volume: item / 1000000});
+            idx2 += 1;
+        });
+        setVolumeArr(newArr2);
+
+        let stocksOb = data['stock_info']['similar'];
+        let newArr3 = [];
+        stocksOb.forEach((item) => {
+            newArr3.push(<Heading
+                color={'white'}
+                fontSize={'2xl'}
+                fontFamily={'body'}
+            > {item}
+            </Heading>);
+        });
+        setStocks(newArr3);
+
+        let tempState = [];
+        data['stock_info']['titles'].forEach((item) => {
+            tempState.push(
+            <>
+            <Stat>
+                <StatLabel>{item['source']}</StatLabel>
+                <StatNumber>{item['title']}</StatNumber>
+                <StatHelpText>
+                {item['role'] == "positive" ? <StatArrow type='increase' /> : <StatArrow type='decrease'/>}
+                {item['role']}
+                </StatHelpText>
+            </Stat>
+            <br/>
+            </>
+            )
+        });
+        setSources(tempState);
+    }, [])
 
     return(
         <>
@@ -258,36 +351,266 @@ const Company = () => {
 					<Text fontSize="sm" ml={2}>Natural View</Text>
 				</Flex>
 
-                <Grid templateColumns={!isChecked ? 'repeat(2, 1fr)' : 'repeat(1, 1fr)'} gap={6} w="100%">
+                <Grid templateColumns={'repeat(1, 1fr)'} gap={6} w="100%" display={!isChecked ? "none" : "block"}>
                     <GridItem w='100%'>
                         <Card metricName={"Description"} title={data['name']} description={data["stock_info"]["description"]} author={"Industry: " + data['sub_industry']}/>
                     </GridItem>
-                    <GridItem w='100%' justifySelf="center" border="1px black solid">
-                        <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={data2}>
-                                <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-                                <CartesianGrid stroke="#ccc" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                            </LineChart>
-                        </ResponsiveContainer>
+
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Metric History"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={analysisArray}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="pop" name="Popularity" stroke="#8884d8" />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="perc" name="Percentage" stroke="#2684d8" />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="rating" name="Rating" stroke="#4854d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
                     </GridItem>
+
                     <GridItem w='100%'>
-                        <Card metricName="description" title="SAMPLE METRIC 60%" description="SAMPLE DESCRIPTION" imgSrc="asd" author="jack" time="mond"/>
+                        <Card metricName={"Stock Information"} custom={
+                            <Flex align="center" flexDirection="column">
+                                <Heading
+                                    color={useColorModeValue('gray.700', 'white')}
+                                    fontSize={'2xl'}
+                                    fontFamily={'body'}
+                                >
+                                    Current Stock Price
+                                </Heading>
+                                <Heading
+                                color={useColorModeValue('gray.700', 'white')}
+                                fontSize={'2xl'}
+                                fontFamily={'body'}
+                                textColor={data['stock_info']['growth'] < 0 ? "red.400" : "green.400"}
+                                >
+                                {data['stock_info']['current_price']}, &nbsp; {parseFloat(data['stock_info']['growth']).toFixed(2)}%
+                                {data['stock_info']['growth'] < 0 ? <ArrowDownIcon/> : <ArrowUpIcon/>}
+                                </Heading>
+
+                                <br/>
+
+                                <Heading
+                                    color={useColorModeValue('gray.700', 'white')}
+                                    fontSize={'2xl'}
+                                    fontFamily={'body'}
+                                >
+                                    Current Market Cap
+                                </Heading>
+                                <Heading
+                                color={useColorModeValue('gray.700', 'white')}
+                                fontSize={'2xl'}
+                                fontFamily={'body'}
+                                textColor="blue.400"
+                                >
+                                ${data['stock_info']['market_cap']['$numberLong']}
+                                </Heading>
+                            </Flex>
+                        }
+                        />
                     </GridItem>
+
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Closing Price History"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={closingpriceArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="price" name="Price" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
                     <GridItem w='100%'>
-                        <Card metricName="description" title="SAMPLE METRIC 60%" description="SAMPLE DESCRIPTION" imgSrc="asd" author="jack" time="mond"/>
+                        <Card metricName={"Market Analysis"} title={data['ticker']} description={data['stock_info']['blurb']}/>
                     </GridItem>
+
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Volume History"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={volumeArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="volume" name="Volume (In Millions)" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
                     <GridItem w='100%'>
-                        <Card metricName="description" title="SAMPLE METRIC 60%" description="SAMPLE DESCRIPTION" imgSrc="asd" author="jack" time="mond"/>
+                        <Card metricName={"Similar Stocks"} custom={
+                            <Flex align="center" flexDirection="column">
+                                {stocks}
+                            </Flex>
+                        }
+                        />
                     </GridItem>
+
+                    <GridItem w='100%'>
+                        <Card metricName={"Similar Stocks"} custom={
+                            <Flex align="center" flexDirection="column">
+                                {sources}
+                            </Flex>
+                        }
+                        />
+                    </GridItem>
+
+
                 </Grid>
-            
+                    
+
+
+
+
+
+
+
+
+                <Grid templateColumns={'repeat(2, 1fr)'} gap={6} w="100%" visibility={!isChecked ? "visible" : "hidden"}>
+
+                    <Flex flexDirection="column">
+                    
+                    <GridItem w='100%'>
+                        <Card metricName={"Description"} title={data['name']} description={data["stock_info"]["description"]} author={"Industry: " + data['sub_industry']}/>
+                    </GridItem>
+                    
+                    <GridItem w='100%'>
+                        <Card metricName={"Stock Information"} custom={
+                            <Flex align="center" flexDirection="column">
+                                <Heading
+                                    color={useColorModeValue('gray.700', 'white')}
+                                    fontSize={'2xl'}
+                                    fontFamily={'body'}
+                                >
+                                    Current Stock Price
+                                </Heading>
+                                <Heading
+                                color={useColorModeValue('gray.700', 'white')}
+                                fontSize={'2xl'}
+                                fontFamily={'body'}
+                                textColor={data['stock_info']['growth'] < 0 ? "red.400" : "green.400"}
+                                >
+                                {data['stock_info']['current_price']}, &nbsp; {parseFloat(data['stock_info']['growth']).toFixed(2)}%
+                                {data['stock_info']['growth'] < 0 ? <ArrowDownIcon/> : <ArrowUpIcon/>}
+                                </Heading>
+
+                                <br/>
+
+                                <Heading
+                                    color={useColorModeValue('gray.700', 'white')}
+                                    fontSize={'2xl'}
+                                    fontFamily={'body'}
+                                >
+                                    Current Market Cap
+                                </Heading>
+                                <Heading
+                                color={useColorModeValue('gray.700', 'white')}
+                                fontSize={'2xl'}
+                                fontFamily={'body'}
+                                textColor="blue.400"
+                                >
+                                ${data['stock_info']['market_cap']['$numberLong']}
+                                </Heading>
+                            </Flex>
+                        }
+                        />
+                    </GridItem>
+
+                    <GridItem w='100%'>
+                        <Card metricName={"Market Analysis"} title={data['ticker']} description={data['stock_info']['blurb']}/>
+                    </GridItem>
+
+                    <GridItem w='100%'>
+                        <Card metricName={"Similar Stocks"} custom={
+                            <Flex align="center" flexDirection="column">
+                                {stocks}
+                            </Flex>
+                        }
+                        />
+                    </GridItem>
+
+                    </Flex>
+
+                    <Flex flexDirection="column">
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Metric History"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={analysisArray}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="pop" name="Popularity" stroke="#8884d8" />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="perc" name="Percentage" stroke="#2684d8" />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="rating" name="Rating" stroke="#4854d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Closing Price History"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={closingpriceArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="price" name="Price" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Volume History"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={volumeArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="volume" name="Volume (In Millions)" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
+                    <GridItem w='100%'>
+                        <Card metricName={"Similar Stocks"} custom={
+                            <Flex align="center" flexDirection="column">
+                                {sources}
+                            </Flex>
+                        }
+                        />
+                    </GridItem>
+
+                    </Flex>
+
+                </Grid>
+
                 
-                
-                
-                
-                {/* {renderLineChart} */}
         </Stack>
         </Container>
         </>
