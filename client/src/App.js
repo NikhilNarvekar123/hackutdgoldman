@@ -230,7 +230,7 @@ function App() {
 				fontWeight={600}
 				fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }}
 				lineHeight={'110%'}>
-				StockSentinel{' '}
+				GoldMine{' '}
 				<br/>
 				<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 					stock sentiment analysis, recommendation, and comparison
