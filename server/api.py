@@ -1,5 +1,3 @@
-import json
-
 from fastapi import FastAPI, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -43,6 +41,22 @@ async def top_industries():
     return ResponseModel(
         success=True,
         message=Mongo.get_top_industries()
+    )
+
+@app.get(f"{API_ENDPOINT}/industry", response_model=ResponseModel)
+async def industry(industry: str):
+    industry = industry.replace("_", " ")
+
+    return ResponseModel(
+        success=True,
+        message=Mongo.get_industry(industry)
+    )
+
+@app.get(f"{API_ENDPOINT}/get_econ_info", response_model=ResponseModel)
+async def econ_info():
+    return ResponseModel(
+        success=True,
+        message=Mongo.get_econ_info()
     )
 
 if __name__ == "__main__":

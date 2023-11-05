@@ -59,8 +59,19 @@ class Mongo:
         top_industries = list(Mongo.industry_collection.find().sort("overall_rating", -1).limit(5))
         return {"top_industries": cls.parse_json(top_industries)}
 
-        
+    @classmethod
+    def get_industry(cls, industry: str) -> dict[str, any]:
+        return {"industry": cls.parse_json(cls.industry_collection.find_one({"industry": industry}))}
     
+    @classmethod
+    def get_econ_info(cls) -> dict[str, any]:
+        return {
+            "producer_price_index": cls.parse_json(cls.econ_collection.find_one({"name": "producer_price_index"})),
+            "consumer_sentiment": cls.parse_json(cls.econ_collection.find_one({"name": "consumer_sentiment"})),
+            "financial_stress": cls.parse_json(cls.econ_collection.find_one({"name": "financial_stress"})),
+            "snp500": cls.parse_json(cls.econ_collection.find_one({"name": "snp500"})),
+            "average": cls.parse_json(cls.econ_collection.find_one({"name": "average"}))
+        }
     
     @classmethod
     def poll(cls) -> None:
