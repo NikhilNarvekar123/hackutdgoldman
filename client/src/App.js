@@ -302,7 +302,7 @@ function App() {
       <Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 				Top Industries
 			</Text>
-			<DataTable columns={lowCols} data={lowLeaderboard} />
+			<DataTable columns={topCols} data={topInd} />
       
 	</Stack>
     </Container>
