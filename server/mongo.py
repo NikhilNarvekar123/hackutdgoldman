@@ -74,6 +74,69 @@ class Mongo:
         }
     
     @classmethod
+    def get_today_info(cls) -> dict[str, any]:
+        # Today's hottest industry
+        # Today's top 3 stocks
+        # Today's bottom 3 stocks
+        # Today's producer_price_index, consumer_sentiment, financial_stress, snp500, average
+        hottest_industry = cls.get_top_industries()["top_industries"][0]
+        hottest_industry = {
+            "industry": hottest_industry["industry"],
+            "overall_rating": hottest_industry["overall_rating"],
+            "perceptions": hottest_industry["perceptions"],
+            "popularity": hottest_industry["popularity"]
+        }
+
+        top_3_stocks = list(Mongo.stock_collection.find().sort("stock_info.overall_rating", -1).limit(3))
+        new_top_3_stocks = []
+        for stock in top_3_stocks:
+            new_top_3_stocks.append({
+                "ticker": stock["ticker"],
+                "name": stock["name"],
+                "industry": stock["industry"],
+                "sub_industry": stock["sub_industry"],
+                "blurb": stock["stock_info"]["blurb"],
+                "overall_rating": stock["stock_info"]["overall_rating"],
+                "perceptions": stock["stock_info"]["perception"],
+                "popularity": stock["stock_info"]["popularity"],
+                "article_titles": stock["stock_info"]["titles"],
+            })
+
+        bottom_3_stocks = list(Mongo.stock_collection.find().sort("stock_info.overall_rating", 1).limit(3))
+        new_bottom_3_stocks = []
+        for stock in bottom_3_stocks:
+            new_bottom_3_stocks.append({
+                "ticker": stock["ticker"],
+                "name": stock["name"],
+                "industry": stock["industry"],
+                "sub_industry": stock["sub_industry"],
+                "blurb": stock["stock_info"]["blurb"],
+                "overall_rating": stock["stock_info"]["overall_rating"],
+                "perceptions": stock["stock_info"]["perception"],
+                "popularity": stock["stock_info"]["popularity"],
+                "article_titles": stock["stock_info"]["titles"],
+            })
+
+        econ_info = cls.get_econ_info()
+        producer_price_index = econ_info["producer_price_index"]["data"][0]
+        consumer_sentiment = econ_info["consumer_sentiment"]["data"][0]
+        financial_stress = econ_info["financial_stress"]["data"][0]
+        snp500 = econ_info["snp500"]["data"][0]
+        average = econ_info["average"]["data"][0]
+
+        return json.dumps({
+            "hottest_industry": cls.parse_json(hottest_industry),
+            "top_3_stocks": cls.parse_json(new_top_3_stocks),
+            "bottom_3_stocks": cls.parse_json(new_bottom_3_stocks),
+            "producer_price_index": producer_price_index,
+            "consumer_sentiment": consumer_sentiment,
+            "financial_stress": financial_stress,
+            "snp500": snp500,
+            "average_consumer_confidence": average
+        })
+
+    
+    @classmethod
     def poll(cls) -> None:
         try:
             cls.client.admin.command('ping')
