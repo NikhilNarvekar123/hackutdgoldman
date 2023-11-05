@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import dict, Any
+from typing import Any
 
 class ResponseModel(BaseModel):
     success: bool

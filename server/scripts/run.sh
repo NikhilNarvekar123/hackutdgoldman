@@ -1,1 +1,1 @@
-uvicorn server:app --reload --lifespan on --host 0.0.0.0 --port 8080
+uvicorn api:app --reload --lifespan on --host 0.0.0.0 --port 8080
