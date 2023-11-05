@@ -4,6 +4,8 @@ import { ChakraProvider, Box, Text, Heading, extendTheme, Container, theme, Stac
 import { createColumnHelper } from "@tanstack/react-table";
 import Navbar from './Navbar';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { useEffect } from "react";
 
 
 const Category = () => {
@@ -12,6 +14,20 @@ const Category = () => {
     const name = location.state?.category || "Tech";
     console.log("location")
     console.log(location)
+
+    useEffect(() => {
+        fetchData();
+    })
+
+    const fetchData = async () => {
+        const apiUrl = `http://localhost:8080/api/industry/?industry=`;
+        axios
+        .get(apiUrl)
+        .then((response) => {
+          console.log("indus", response.data);
+        }).catch((error) => 
+         console.error('Error fetching data:', error));
+      }
 
     const columnHelper = createColumnHelper();
 
