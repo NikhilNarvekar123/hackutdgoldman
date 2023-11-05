@@ -88,16 +88,16 @@ function App() {
 
   function makeTable(leaderboardData) {
     let data = [];
-    let lowData = [];
-  for (var i = 0; i < leaderboardData['message']['highest_rated_stocks'].length; i++) {
-    data.push({name: leaderboardData['message']['highest_rated_stocks'][i]['name'], 
-    perception: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['perception'],
-    rating: leaderboardData['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']
+  let lowData = [];
+  for (var i = 0; i < leaderboardData['data']['message']['highest_rated_stocks'].length; i++) {
+    data.push({name: leaderboardData['data']['message']['highest_rated_stocks'][i]['name'], 
+    perception: leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['perception'],
+    rating: leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']
   });
   
-  lowData.push({name: leaderboardData['message']['lowest_rated_stocks'][i]['name'], 
-    perception: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
-    rating: leaderboardData['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
+  lowData.push({name: leaderboardData['data']['message']['lowest_rated_stocks'][i]['name'], 
+    perception: leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
+    rating: leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
   });
   }
 
