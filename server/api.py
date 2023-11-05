@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Query, Depends
+import os
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.response_model import ResponseModel
@@ -17,10 +19,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/scrapers/cached_earnings_reports", app=StaticFiles(directory="scrapers/cached_earnings_reports"))
 
 @app.get("/", response_model=ResponseModel)
 async def default():
     return ResponseModel(success=True, message={"Routes": "/api/v1/scraper, /api/v1/stock, /api/v1/leaderboard"})
+
+@app.get(f"{API_ENDPOINT}/files", response_model=ResponseModel)
+async def files(ticker: str):
+    ticker = ticker.lower()
+    directory = f"scrapers/cached_earnings_reports/{ticker}"
+    links = []
+    
+    if os.path.exists(directory):
+        for filename in os.listdir(directory):
+            link = f"/scrapers/cached_earnings_reports/{ticker}/{filename}"
+            links.append(link)
+
+    return ResponseModel(success=True, message={"links": links})
 
 @app.get(f"{API_ENDPOINT}/stock", response_model=ResponseModel)
 async def stock(ticker: str) -> ResponseModel:
