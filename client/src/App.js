@@ -148,7 +148,9 @@ function App() {
   }
 
   useEffect(() => {
-    fetchLeaderboardData()
+    fetchLeaderboardData();
+    fetchEconData();
+    fetchIndusData();
   })
 
   const fetchLeaderboardData = async () => {
@@ -161,6 +163,28 @@ function App() {
     }).catch((error) => 
      console.error('Error fetching data:', error));
   }
+
+  const fetchEconData = async () => {
+    const apiUrl = `http://localhost:8080/api/get_econ_info`;
+    axios
+    .get(apiUrl)
+    .then((response) => {
+      console.log("econ", response)
+    }).catch((error) => 
+     console.error('Error fetching data:', error));
+  }
+  
+
+  const fetchIndusData = async () => {
+    const apiUrl = `http://localhost:8080/api/top_industries`;
+    axios
+    .get(apiUrl)
+    .then((response) => {
+      console.log("industries", response)
+    }).catch((error) => 
+     console.error('Error fetching data:', error));
+  }
+  
 
   return (
     <Container maxW={'5xl'}>
@@ -239,6 +263,11 @@ function App() {
 
 			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 				Lowest Rated Stocks
+			</Text>
+			<DataTable columns={lowCols} data={lowLeaderboard} />
+
+      <Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
+				Top Industries
 			</Text>
 			<DataTable columns={lowCols} data={lowLeaderboard} />
       
