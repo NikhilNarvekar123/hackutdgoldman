@@ -5,7 +5,8 @@ import Navbar from './Navbar';
 import { useState, useEffect } from "react";
 import {ArrowUpIcon, ArrowDownIcon, CheckIcon, CloseIcon} from '@chakra-ui/icons';
 import { CircularProgressLabel, CircularProgress } from "@chakra-ui/react";
-
+import axios from 'axios'
+import { useLocation } from 'react-router-dom';
 
 
 const data = {
@@ -154,9 +155,6 @@ const data = {
     }
 }
 
-//   console.log(data)
-
-
 
 const Card = (props) => {
     return (
@@ -229,10 +227,10 @@ const GraphCard = (props) => {
     )
 }
 
-
-
-
 const Company = () => {
+
+    const location = useLocation();
+    const name = location.state?.category || "AAPL";
 	
     const [isChecked, setIsChecked] = useState(true);
     const toggleSwitch = () => {
@@ -243,6 +241,21 @@ const Company = () => {
     const [volumeArr, setVolumeArr] = useState([]);
     const [stocks, setStocks] = useState([]);
     const [sources, setSources] = useState([]);
+
+    const [stockData, setStockData] = useState(null); // change all instances of data to stockData (the fetched api)
+
+    useEffect(() => {
+        const apiUrl = `http://127.0.0.1:8080/api/stock/?ticker=`;
+        axios.get(apiUrl + name)
+          .then(response => {
+            // Set the state to the response data
+            setStockData(response.data);
+            console.log(stockData);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      }, [name]);
 
     useEffect(() => {
         let stock_analysis = data['history']['stock_analysis'];

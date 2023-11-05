@@ -152,7 +152,7 @@ function App() {
   })
 
   const fetchLeaderboardData = async () => {
-    const apiUrl = `http://127.0.0.1:8080/api/v1/leaderboard`;
+    const apiUrl = `http://localhost:8080/api/stock_leaderboard`;
     axios
     .get(apiUrl)
     .then((response) => {
