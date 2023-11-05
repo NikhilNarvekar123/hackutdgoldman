@@ -17,43 +17,43 @@ import useSound from 'use-sound'
 import cache from './cache.mp3'
 import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody } from '@chakra-ui/react';
 
-// const data = [
-// 	{
-// 	  fromUnit: "Google",
-// 	  toUnit: "80",
-// 	  factor: 25.4,
-// 	},
-// 	{
-// 	  fromUnit: "Datadog",
-// 	  toUnit: "70",
-// 	  factor: 30.48,
-// 	},
-// 	{
-// 	  fromUnit: "Whatnot",
-// 	  toUnit: "19",
-// 	  factor: 0.91444,
-// 	},
-// ];
+const data2 = [
+	{
+	  fromUnit: "Google",
+	  toUnit: "80",
+	  factor: 25.4,
+	},
+	{
+	  fromUnit: "Datadog",
+	  toUnit: "70",
+	  factor: 30.48,
+	},
+	{
+	  fromUnit: "Whatnot",
+	  toUnit: "19",
+	  factor: 0.91444,
+	},
+];
 
 const columnHelper = createColumnHelper();
 
-// const columns = [
-// 	columnHelper.accessor("fromUnit", {
-// 	  cell: (info) => info.getValue(),
-// 	  header: "Company",
-// 	}),
-// 	columnHelper.accessor("toUnit", {
-// 	  cell: (info) => info.getValue(),
-// 	  header: "Sentiment",
-// 	}),
-// 	columnHelper.accessor("factor", {
-// 	  cell: (info) => info.getValue(),
-// 	  header: "Rank",
-// 	  meta: {
-// 		isNumeric: true,
-// 	  },
-// 	}),
-// ];
+const columns2 = [
+	columnHelper.accessor("fromUnit", {
+	  cell: (info) => info.getValue(),
+	  header: "Company",
+	}),
+	columnHelper.accessor("toUnit", {
+	  cell: (info) => info.getValue(),
+	  header: "Sentiment",
+	}),
+	columnHelper.accessor("factor", {
+	  cell: (info) => info.getValue(),
+	  header: "Rank",
+	  meta: {
+		isNumeric: true,
+	  },
+	}),
+];
 
 
 function App() {
@@ -113,13 +113,13 @@ function App() {
   let lowData = [];
   for (var i = 0; i < leaderboardData['data']['message']['highest_rated_stocks'].length; i++) {
     data.push({name: leaderboardData['data']['message']['highest_rated_stocks'][i]['name'], 
-    perception: leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['perception'],
-    rating: leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']
+    perception: parseFloat((leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['perception']).toFixed(2)),
+    rating: parseFloat((leaderboardData['data']['message']['highest_rated_stocks'][i]['stock_info']['overall_rating']).toFixed(2))
   });
   
   lowData.push({name: leaderboardData['data']['message']['lowest_rated_stocks'][i]['name'], 
-    perception: leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['perception'],
-    rating: leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']
+    perception: parseFloat((leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['perception']).toFixed(2)),
+    rating: parseFloat((leaderboardData['data']['message']['lowest_rated_stocks'][i]['stock_info']['overall_rating']).toFixed(2))
   });
   }
 
@@ -210,8 +210,8 @@ function App() {
       for (var i = 0; i < response.data['message']['top_industries'].length; i++) {
         inData.push({
           industry: response.data['message']['top_industries'][i]['industry'],
-          perception: response.data['message']['top_industries'][i]['perceptions'],
-          rating: response.data['message']['top_industries'][i]['overall_rating'],
+          perception: parseFloat(response.data['message']['top_industries'][i]['perceptions'].toFixed(2)),
+          rating: parseFloat(response.data['message']['top_industries'][i]['overall_rating'].toFixed(2)),
         })
       }
       const columns = [
@@ -257,7 +257,7 @@ function App() {
     let newArr = [];
     ppi_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
-        newArr.push({name: abbreviatedMonths[idx], ppi: item});
+        newArr.push({name: abbreviatedMonths[idx], ppi: parseFloat(item.toFixed(2))});
         idx += 1;
     });
     setPpiArr(newArr);
@@ -267,7 +267,7 @@ function App() {
     let newArr1 = [];
     cs_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
-        newArr.push({name: abbreviatedMonths[idx1], cs: item});
+        newArr1.push({name: abbreviatedMonths[idx1], cs: parseFloat(item.toFixed(2))});
         idx1 += 1;
     });
     setCsArr(newArr1)
@@ -277,7 +277,7 @@ function App() {
     let newArr2 = [];
     fs_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
-        newArr2.push({name: abbreviatedMonths[idx2], fs: item});
+        newArr2.push({name: abbreviatedMonths[idx2], fs: parseFloat(item.toFixed(2))});
         idx2 += 1;
     });
     setFsArr(newArr2)
@@ -287,7 +287,7 @@ function App() {
     let newArr3 = [];
     snp_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
-        newArr3.push({name: abbreviatedMonths[idx], snp: item});
+        newArr3.push({name: abbreviatedMonths[idx3], snp: parseFloat(item.toFixed(2))});
         idx3 += 1;
     });
     setSnp(newArr3)
@@ -409,15 +409,6 @@ On the positive side, the Information Technology industry is the hottest industr
 			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 				Highest Rated Stocks
 			</Text>
-			<DataTable columns={cols} data={leaderboard} />
-
-			<br/>
-
-			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
-				Lowest Rated Stocks
-			</Text>
-			<DataTable columns={lowCols} data={lowLeaderboard} />
-
       <Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 				Top Industries
 			</Text>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, chakra } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, chakra, Box } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
   useReactTable,
@@ -32,7 +32,7 @@ export function DataTable<Data extends object>({
   });
 
   return (
-    <Table>
+    <Table variant="simple">
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -44,6 +44,8 @@ export function DataTable<Data extends object>({
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
                   isNumeric={meta?.isNumeric}
+                  bgColor="lightblue"
+                  color="white"
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -71,7 +73,12 @@ export function DataTable<Data extends object>({
             {row.getVisibleCells().map((cell) => {
               const meta: any = cell.column.columnDef.meta;
               return (
-                <Td key={cell.id} isNumeric={meta?.isNumeric}>
+                <Td
+                  key={cell.id}
+                  isNumeric={meta?.isNumeric}
+                  bgColor="white"
+                  color="gray.600"
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Td>
               );
