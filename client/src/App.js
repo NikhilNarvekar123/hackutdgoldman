@@ -65,15 +65,15 @@ function App() {
 	};
 
 
-	const [show, setShow] = React.useState(false)
-	let audio = new Audio("/PATH")
+	// const [show, setShow] = useState(false)
+	// let audio = new Audio("/PATH")
 
-	React.useEffect(() => {
-		const timeout = setTimeout(() => {
-			audio.play();
-		}, 5000)
-		return () => clearTimeout(timeout)
-	}, [show])
+	// useEffect(() => {
+	// 	const timeout = setTimeout(() => {
+	// 		audio.play();
+	// 	}, 5000)
+	// 	return () => clearTimeout(timeout)
+	// }, [show])
 
 
 	const onSubmit = () => {
@@ -238,7 +238,7 @@ function App() {
   const [fsArr, setFsArr] = useState([])
   const [snp, setSnp] = useState([])
   useEffect(() => {
-
+	if(econData) {
     // Loop through the array of objects
     const abbreviatedMonths = [
         "Dec", "Jan", "Feb", "Mar", "Apr", "May",
@@ -283,7 +283,7 @@ function App() {
         idx3 += 1;
     });
     setSnp(newArr3)
-
+	}
 
     }, [econData])
   
