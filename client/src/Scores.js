@@ -28,18 +28,38 @@ const Scores = () => {
         };
       }, [bar1, bar2]);
 
+      const bounceAnimation = `
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+  `;
+
     return (
     <Container>
         <Stack marginTop={8} spacing={5}>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5"}}>
             <Progress color='red' value={bar1} width='sm' height='64px' alignSelf={'center'} />
             <Heading marginLeft={8} fontSize={64}> {bar1}%</Heading>
-            <Icon as={barUp1 ? MdArrowUpward : MdArrowDownward} boxSize={10} color="green.500" marginLeft={4} />
+            <style>{bounceAnimation}</style>
+            <Icon as={barUp1 ? MdArrowUpward : MdArrowDownward} boxSize={10} color={barUp1 ? "green.500" : "red.500"} marginLeft={4} style={{
+          animation: "bounce 1s infinite",
+        }}/>
             </Box>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5" }}>
             <Progress color='red' value={bar2} width='sm' height='64px' alignSelf={'center'} />
             <Heading marginLeft={8} fontSize={64}> {bar2}%</Heading>
-            <Icon as={barUp2 ? MdArrowUpward : MdArrowDownward} boxSize={10} color="red.500" marginLeft={4} />
+            <style>{bounceAnimation}</style>
+            <Icon as={barUp2 ? MdArrowUpward : MdArrowDownward} boxSize={10} color={barUp2 ? "green.500" : "red.500"} marginLeft={4} style={{
+          animation: "bounce 1s infinite",
+        }}/>
             </Box>
         </Stack>
 
