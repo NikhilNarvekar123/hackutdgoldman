@@ -1,9 +1,12 @@
+import Scores from "./Scores";
 
 
 const Company = () => {
 
     return(
-        <></>
+        <>
+        <Scores></Scores>
+        </>
     );
 }
 

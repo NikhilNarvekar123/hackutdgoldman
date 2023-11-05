@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChakraProvider, Box, Text, Heading, extendTheme, Container, Progress } from '@chakra-ui/react';
 import Terminal, { ColorMode, TerminalOutput } from 'react-terminal-ui';
+import Scores from './Scores';
 
 const theme = extendTheme({});
 
@@ -23,7 +24,7 @@ const phrases = [
   "Computing scores of S&P500"
 ];
 
-function Loading() {
+const Loading = () => {
     const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
     const [text, setText] = useState('');
     const [dotCount, setDotCount] = useState(0)
@@ -140,7 +141,6 @@ function Loading() {
           lineHeight={'110%'}>
           {phrases[currentPhraseIndex]}{text}
         </Heading> */}
-        
         <Terminal name='Goldman Sachs' colorMode={ ColorMode.Dark }  onInput={ terminalInput => console.log(`New terminal input received: '${ terminalInput }'`) }>
         <span style={{ color: '#42A5F5' }}>{phrases[currentPhraseIndex]}{text}</span>
         {/* {stockPhrases.map((phrase, index) => 
