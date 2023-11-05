@@ -277,7 +277,7 @@ function App() {
     let snp_data = econData['message']['snp500']['data'];
     let idx3 = 0;
     let newArr3 = [];
-    ppi_data.forEach((item) => {
+    snp_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
         newArr3.push({name: abbreviatedMonths[idx], snp: item});
         idx3 += 1;
@@ -383,6 +383,39 @@ function App() {
                                     <Line type="monotone" isAnimationActive={false} dataKey="ppi" name="Producer Price Index" stroke="#8884d8" />
                                 </LineChart>
                             </ResponsiveContainer>
+
+      <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+          <LineChart isAnimationActive={false} data={csArr}>
+              <CartesianGrid stroke="#ccc" fill="white"/>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" isAnimationActive={false} dataKey="cs" name="Consumer Sentiment" stroke="#8884d8" />
+          </LineChart>
+      </ResponsiveContainer>
+
+      <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={fsArr}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="fs" name="Financial Stress" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
+
+    <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+        <LineChart isAnimationActive={false} data={snp}>
+            <CartesianGrid stroke="#ccc" fill="white"/>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" isAnimationActive={false} dataKey="snp" name="snp500" stroke="#8884d8" />
+        </LineChart>
+    </ResponsiveContainer>
       
 	</Stack>
     </Container>
