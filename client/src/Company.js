@@ -252,7 +252,7 @@ const Company = () => {
             // Set the state to the response data
             setStockData(response.data['message']['stock']);
             console.log(response.data['message']['stock']);
-            setRiskMultiplier(response.data['message']['stock']['earrnings']['cosine_scores'][11]);
+            setRiskMultiplier(response.data['message']['stock']['earnings']['cosine_scores'][11]);
           })
           .catch(error => {
             console.error('Error:', error);
@@ -338,6 +338,7 @@ const Company = () => {
         setSources(tempState);
         }
     }, [data])
+    
 
     // const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
     const randomBaseScore = data["overall_rating"];

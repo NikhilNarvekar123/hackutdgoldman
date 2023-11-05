@@ -298,9 +298,9 @@ const Category = () => {
                 }/>
             </GridItem>
 
-            {/* <GridItem w='100%'>
+            <GridItem w='100%'>
                 <Card metricName={"Description"} title={data['name']} description={data["stock_info"]["description"]} author={"Industry: " + data['sub_industry']}/>
-            </GridItem> */}
+            </GridItem>
 
         </Grid>
                     
