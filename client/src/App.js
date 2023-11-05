@@ -7,10 +7,11 @@ import { ColorModeScript, Switch, SliderTrack, SliderThumb, SliderFilledTrack, e
 	AlertTitle,
 	AlertDescription,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "./DataTable.tsx";
+import axios from 'axios';
 
 const data = [
 	{
@@ -50,23 +51,6 @@ const columns = [
 	}),
 ];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function App() {
 
 	const navigate = useNavigate();
@@ -94,6 +78,27 @@ function App() {
 		}
 	}
 
+  const [leaderboard, setLeaderboard] = useState([])
+
+  useEffect(() => {
+    fetchLeaderboardData()
+  })
+
+  // { top_5_perception: [{}, {}]
+//  bottom_5_perception
+// top_5_overall_rating
+// }
+
+  const fetchLeaderboardData = async () => {
+    const apiUrl = `http://127.0.0.1:8080/api/v1/leaderboard`;
+    axios
+    .get(apiUrl)
+    .then((response) => {
+      console.log("leaderboard", response)
+      setLeaderboard(response)
+    }).catch((error) => 
+     console.error('Error fetching data:', error));
+  }
 
   return (
     <Container maxW={'5xl'}>
