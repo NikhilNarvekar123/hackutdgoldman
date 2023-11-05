@@ -9,6 +9,63 @@ import { ColorModeScript, Switch, SliderTrack, SliderThumb, SliderFilledTrack, e
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createColumnHelper } from "@tanstack/react-table";
+import { DataTable } from "./DataTable.tsx";
+
+const data = [
+	{
+	  fromUnit: "Google",
+	  toUnit: "80",
+	  factor: 25.4,
+	},
+	{
+	  fromUnit: "Datadog",
+	  toUnit: "70",
+	  factor: 30.48,
+	},
+	{
+	  fromUnit: "Whatnot",
+	  toUnit: "19",
+	  factor: 0.91444,
+	},
+];
+
+const columnHelper = createColumnHelper();
+
+const columns = [
+	columnHelper.accessor("fromUnit", {
+	  cell: (info) => info.getValue(),
+	  header: "Company",
+	}),
+	columnHelper.accessor("toUnit", {
+	  cell: (info) => info.getValue(),
+	  header: "Sentiment",
+	}),
+	columnHelper.accessor("factor", {
+	  cell: (info) => info.getValue(),
+	  header: "Rank",
+	  meta: {
+		isNumeric: true,
+	  },
+	}),
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function App() {
 
@@ -102,6 +159,21 @@ function App() {
 			</Container>
 
 
+			<br/>
+			<br/>
+			<br/>
+
+			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
+				Top Companies
+			</Text>
+			<DataTable columns={columns} data={data} />
+
+			<br/>
+
+			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
+				Top Categories
+			</Text>
+			<DataTable columns={columns} data={data} />
       
 	</Stack>
     </Container>
