@@ -409,6 +409,11 @@ On the positive side, the Information Technology industry is the hottest industr
 			<Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 				Highest Rated Stocks
 			</Text>
+      <DataTable columns={cols} data={leaderboard} />
+      <Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
+				Lowest Rated Stocks
+			</Text>
+      <DataTable columns={lowCols} data={lowLeaderboard} />
       <Text as={'span'} fontSize={{base: 'xl'}} color={'blue.300'}>
 				Top Industries
 			</Text>
