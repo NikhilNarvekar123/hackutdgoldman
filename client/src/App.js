@@ -267,7 +267,7 @@ function App() {
     let newArr1 = [];
     cs_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
-        newArr.push({name: abbreviatedMonths[idx1], cs: item});
+        newArr1.push({name: abbreviatedMonths[idx1], cs: item});
         idx1 += 1;
     });
     setCsArr(newArr1)
@@ -287,7 +287,7 @@ function App() {
     let newArr3 = [];
     snp_data.forEach((item) => {
         // Extract and push the values of the fields into their respective arrays
-        newArr3.push({name: abbreviatedMonths[idx], snp: item});
+        newArr3.push({name: abbreviatedMonths[idx3], snp: item});
         idx3 += 1;
     });
     setSnp(newArr3)
