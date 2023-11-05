@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ChakraProvider, Box, Text, Heading, extendTheme, Container, Progress } from '@chakra-ui/react';
 import Terminal, { ColorMode, TerminalOutput } from 'react-terminal-ui';
 import Scores from './Scores';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const theme = extendTheme({});
 
@@ -25,6 +27,13 @@ const phrases = [
 ];
 
 const Loading = () => {
+
+    const location = useLocation();
+    const name = location.state?.category || "google";
+    const isCategory = location.state?.isCategory || false;
+    console.log("LOCATION")
+    console.log(location)
+
     const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
     const [text, setText] = useState('');
     const [dotCount, setDotCount] = useState(0)
@@ -64,7 +73,29 @@ const Loading = () => {
 
     const [percent, setPercent] = useState(0);
     const [stockPhrases, setStockPhrases] = useState(["Using data visualization libraries to create interactive financial dashboards."]);
-    const [stockIdx, setStockIdx] = useState(0)
+    const [stockIdx, setStockIdx] = useState(0);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Use setTimeout to delay the navigation
+        const delay = 5000; // 8 seconds in milliseconds
+    
+        const timer = setTimeout(() => {
+          // Navigate to the next page after the delay
+          let nextPage = "";
+          if (!isCategory) {
+            nextPage = "/company/" + name;
+          } else {
+            nextPage = "/category/" + name;
+          }
+          console.log(name, nextPage)
+          navigate(nextPage); 
+        }, delay);
+    
+        return () => {
+          clearTimeout(timer); // Clear the timeout if the component unmounts
+        };
+      }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -72,7 +103,7 @@ const Loading = () => {
       setCurrentPhraseIndex((prevIndex) => (prevIndex + 1) % phrases.length);
       setDotCount(0)
         setText('')
-    }, 3000); // Change phrase every 3 seconds
+    }, 2500); // Change phrase every 3 seconds
 
     return () => {
       clearInterval(timer);
@@ -89,7 +120,7 @@ const Loading = () => {
             setDotCount(0)
             clearInterval(textInterval);
           }
-        }, 600); // Add a character every second
+        }, 500); // Add a character every second
   
       return () => {
         clearInterval(textInterval);
@@ -112,7 +143,7 @@ const Loading = () => {
         setStockIdx(0)
     }
 }
-    }, 10); 
+    }, 5); 
 
     return () => {
       clearInterval(timer);
