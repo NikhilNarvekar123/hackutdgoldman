@@ -31,8 +31,8 @@ const Loading = () => {
     const location = useLocation();
     const name = location.state?.category || "google";
     const isCategory = location.state?.isCategory || false;
-    console.log("LOCATION")
-    console.log(location)
+    // console.log("LOCATION")
+    // console.log(location)
 
     const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
     const [text, setText] = useState('');
@@ -89,7 +89,7 @@ const Loading = () => {
             nextPage = "/category/" + name;
           }
           console.log(name, nextPage)
-          navigate(nextPage); 
+          navigate(nextPage, {state: {category: name, isCategory: isCategory}}); 
         }, delay);
     
         return () => {
