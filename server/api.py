@@ -59,5 +59,6 @@ async def econ_info():
         message=Mongo.get_econ_info()
     )
 
+
 if __name__ == "__main__":
     app.run()

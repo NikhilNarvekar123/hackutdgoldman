@@ -1,7 +1,5 @@
-import yfinance as yf
 import requests
 import math
-import openai
 from difflib import SequenceMatcher
 
 from sources.news import News
@@ -9,11 +7,11 @@ from sources.reddit import Reddit
 from sources.youtube import Youtube
 
 from util.config import Config
+from util.model import Model
 from ticker import Ticker
 
 POLYGON_API_KEY = Config.POLYGON_API_KEY
 OPENAI_API_KEY = Config.OPENAI_API_KEY
-openai.api_key = OPENAI_API_KEY
 
 class Stock:
     def __init__(self, ticker):
@@ -54,26 +52,8 @@ class Stock:
         
         # return "Insert blurb here"
 
-        response: dict[str, str] = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant designed to take in stock data and return an smart but concise analysis on the market trends. Use and cite quantitative data to determine if the stock is worth buying or not. Every sentence should be a point backed up by data. Provide a single concise paragraph blurb of no more than 150 characters.",
-                },
-                {
-                    "role": "user",
-                    "content": str(stock_data),
-                }
-            ],
-            temperature=0.7,
-            max_tokens=256,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-        )
-        # print(response.choices[0].message.content)
-        return response.choices[0].message.content
+        response: str = Model.get_chat_response(str(stock_data))
+        return response
     
     def perform_analysis(self, needs_blurb=False, month: int=10, year: int=2023) -> dict[str, any]:
         print(f"Performing analysis on {self.name} for {month}/{year}")

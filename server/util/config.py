@@ -18,3 +18,5 @@ class Config:
     REDDIT_APP_SECRET = os.getenv('REDDIT_APP_SECRET')
 
     FRED_API_KEY = os.getenv('FRED_API_KEY')
+
+    ELEVENLABS_API_KEY = os.getenv('ELEVENLABS_API_KEY')
