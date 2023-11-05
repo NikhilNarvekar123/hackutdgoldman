@@ -137,7 +137,7 @@ function App() {
 					<Text fontSize="sm" mr={2}>Company Search</Text>
 					<Switch isChecked={isChecked} onChange={toggleSwitch} size="lg" colorScheme={"blue"} />
 					<Text fontSize="sm" ml={2}>Category Search</Text>
-					</Flex>
+				</Flex>
 
 
 					<Button

@@ -44,7 +44,7 @@ const Scores = () => {
 
     return (
     <Container>
-        <Stack marginTop={8} spacing={5}>
+        <Stack spacing={5}>
             <Box style={{ display: "flex", alignItems: "center", color: "#42A5F5"}}>
             <Progress color='red' value={bar1} width='sm' height='64px' alignSelf={'center'} />
             <Heading marginLeft={8} fontSize={64}> {bar1}%</Heading>
