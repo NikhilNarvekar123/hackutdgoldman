@@ -340,6 +340,7 @@ const Company = () => {
         setSources(tempState);
         }
     }, [data])
+    
 
     const [randomBaseScore, setRandomBaseScore] = useState(1);
     const [score, setScore] = useState(50);
