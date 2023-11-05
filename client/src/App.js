@@ -13,6 +13,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "./DataTable.tsx";
 import axios from 'axios';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import useSound from 'use-sound'
+import cache from './cache.mp3'
+import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody } from '@chakra-ui/react';
 
 // const data = [
 // 	{
@@ -64,16 +67,21 @@ function App() {
 		setIsChecked(!isChecked);
 	};
 
+	const [playSound] = useSound(cache);
+
+
 
 	// const [show, setShow] = useState(false)
 	// let audio = new Audio("/PATH")
 
-	// useEffect(() => {
-	// 	const timeout = setTimeout(() => {
-	// 		audio.play();
-	// 	}, 5000)
-	// 	return () => clearTimeout(timeout)
-	// }, [show])
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			console.log("ASD")
+			let audio =  new Audio(cache);
+			audio.play();
+		}, 5000)
+		// return () => clearTimeout(timeout)
+	}, [])
 
 
 	const onSubmit = () => {
@@ -167,7 +175,7 @@ function App() {
     fetchLeaderboardData();
     fetchEconData();
     fetchIndusData();
-  })
+  }, [])
 
   const fetchLeaderboardData = async () => {
     const apiUrl = `http://localhost:8080/api/stock_leaderboard`;
@@ -288,6 +296,16 @@ function App() {
     }, [econData])
   
 
+	const [isOpen, setIsOpen] = useState(false);
+
+	const handleOpenPopover = () => {
+	  setIsOpen(true);
+	};
+  
+	const handleClosePopover = () => {
+	  setIsOpen(false);
+	};
+
   return (
     <Container maxW={'5xl'}>
     <Stack
@@ -295,6 +313,35 @@ function App() {
         align={'center'}
         spacing={{ base: 8, md: 10 }}
         py={{ base: 20, md: 28 }}>
+
+		<Popover isOpen={isOpen} onClose={handleClosePopover}>
+        <PopoverTrigger>
+		
+			<Box
+			position="fixed"
+			bottom="20px" // Adjust as needed
+			right="20px" // Adjust as needed
+			>
+			<Button colorScheme="blue" size="md" onClick={handleOpenPopover}>
+				Transcript
+			</Button>
+			</Box>
+
+        </PopoverTrigger>
+
+        <PopoverContent maxH="200px" overflowY="auto">
+          <PopoverBody>
+			Welcome to Goldmine! Today is Sunday, November 5th. Let's dive into the market analysis.
+			<br/>
+			According to our analysis today, the overall consumer sentiment is at 67 point 9 percent, indicating a positive outlook among consumers.
+			However, there are a few anomalies to note. We noticed a downturn in our earnings analysis as 
+supported by the SEC and recent earnings report for Charles Schwab and Hartford Financial Services Group. We think this indicates possible undervaluation or market skepticism, so keep an eye on these two. 
+On the positive side, the Information Technology industry is the hottest industry today and has been for a couple weeks, with an overall rating of 37 point 04. We think it's a good time to invest in IT stocks. Outside of that, we see that Amex within the Financials industry has had a huge jump, with a positive overall rating of 66 point 51, indicating potential growth opportunities.
+          </PopoverBody>
+        </PopoverContent>
+
+
+
 			<Heading
 				fontWeight={600}
 				fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }}
@@ -308,6 +355,7 @@ function App() {
 			<Text color={'gray.500'} maxW={'3xl'}>
 				Enter a company name or select a company category from the form below to get started.
 			</Text>
+
 
 			<br/>
 			<Container maxW="65%">
@@ -417,6 +465,7 @@ function App() {
         </LineChart>
     </ResponsiveContainer>
       
+	</Popover>
 	</Stack>
     </Container>
   );

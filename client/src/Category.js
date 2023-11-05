@@ -20,14 +20,14 @@ const Category = () => {
     })
 
     const fetchData = async () => {
-        const apiUrl = `http://localhost:8080/api/industry/?industry=`;
+        const apiUrl = `http://localhost:8080/api/industry/?industry=Industrials`;
         axios
         .get(apiUrl)
         .then((response) => {
           console.log("indus", response.data);
         }).catch((error) => 
          console.error('Error fetching data:', error));
-      }
+    }
 
     const columnHelper = createColumnHelper();
 
