@@ -183,7 +183,7 @@ const Card = (props) => {
               fontFamily={'body'}>
               {props.title}
             </Heading>
-            <Text color={'gray.500'} textAlign="left">
+            <Text color={'gray.300'} textAlign="left">
               {props.description}
             </Text>
 
@@ -399,7 +399,7 @@ const Company = () => {
                                     <Tooltip />
                                     <Legend />
                                     <Line type="monotone" isAnimationActive={false} dataKey="pop" name="Popularity" stroke="#8884d8" />
-                                    <Line type="monotone" isAnimationActive={false} dataKey="perc" name="Percentage" stroke="#2684d8" />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="perc" name="Perception" stroke="#2684d8" />
                                     <Line type="monotone" isAnimationActive={false} dataKey="rating" name="Rating" stroke="#4854d8" />
                                 </LineChart>
                             </ResponsiveContainer>
@@ -495,7 +495,7 @@ const Company = () => {
                     </GridItem>
 
                     <GridItem w='100%'>
-                        <Card metricName={"Similar Stocks"} custom={
+                        <Card metricName={"Sentiment Analysis"} custom={
                             <Flex align="center" flexDirection="column">
                                 {sources}
                             </Flex>
@@ -590,7 +590,7 @@ const Company = () => {
                                     <Tooltip />
                                     <Legend />
                                     <Line type="monotone" isAnimationActive={false} dataKey="pop" name="Popularity" stroke="#8884d8" />
-                                    <Line type="monotone" isAnimationActive={false} dataKey="perc" name="Percentage" stroke="#2684d8" />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="perc" name="Perception" stroke="#2684d8" />
                                     <Line type="monotone" isAnimationActive={false} dataKey="rating" name="Rating" stroke="#4854d8" />
                                 </LineChart>
                             </ResponsiveContainer>
@@ -631,7 +631,7 @@ const Company = () => {
                     </GridItem>
 
                     <GridItem w='100%'>
-                        <Card metricName={"Similar Stocks"} custom={
+                        <Card metricName={"Sentiment Analysis"} custom={
                             <Flex align="center" flexDirection="column">
                                 {sources}
                             </Flex>
