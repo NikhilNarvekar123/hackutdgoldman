@@ -1,5 +1,5 @@
 import Scores from "./Scores";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, AreaChart } from 'recharts';
 import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames, Stat, StatLabel, StatNumber, StatArrow, StatHelpText } from '@chakra-ui/react';
 import Navbar from './Navbar';
 import { useState, useEffect } from "react";
@@ -199,8 +199,6 @@ const Card = (props) => {
     )
 }
 
-const riskMultiplier = 1.14;
-
 const GraphCard = (props) => {
     return (
       <Center py={6}>
@@ -240,10 +238,12 @@ const Company = () => {
     const [analysisArray, setAnalysisArr] = useState([]);
     const [closingpriceArr, setClosingPriceArr] = useState([]);
     const [volumeArr, setVolumeArr] = useState([]);
+    const [earnings, setEarnings] = useState([]);
     const [stocks, setStocks] = useState([]);
     const [sources, setSources] = useState([]);
 
     const [data, setStockData] = useState(null); // change all instances of data to stockData (the fetched api)
+    const [riskMultiplier, setRiskMultiplier] = useState(1)
 
     useEffect(() => {
         const apiUrl = `http://127.0.0.1:8080/api/stock/?ticker=`;
@@ -252,6 +252,7 @@ const Company = () => {
             // Set the state to the response data
             setStockData(response.data['message']['stock']);
             console.log(response.data['message']['stock']);
+            setRiskMultiplier(response.data['message']['stock']['earrnings']['cosine_scores'][11]);
           })
           .catch(error => {
             console.error('Error:', error);
@@ -296,6 +297,16 @@ const Company = () => {
         });
         setVolumeArr(newArr2);
 
+        let earn = data['earnings']['cosine_scores'];
+        let idx4 = 0;
+        let newArr4 = [];
+        earn.forEach((item) => {
+            // Extract and push the values of the fields into their respective arrays
+            newArr4.push({name: abbreviatedMonths[idx4], earned: parseFloat(item.toFixed(2))});
+            idx4 += 1;
+        });
+        setEarnings(newArr4);
+
         let stocksOb = data['stock_info']['similar'];
         let newArr3 = [];
         stocksOb.forEach((item) => {
@@ -329,7 +340,7 @@ const Company = () => {
     }, [data])
 
     // const data2 = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 200, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
-    const randomBaseScore = -40;
+    const randomBaseScore = data["overall_rating"];
     const score = parseFloat((randomBaseScore*riskMultiplier).toFixed(2));
     const [circScore, setCircScore] = useState(100*(score < 0))
     useEffect(() => {
@@ -523,6 +534,23 @@ const Company = () => {
                     </GridItem>
 
 
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Change in Earnings"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <AreaChart isAnimationActive={false} data={earnings}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="earned" name="Difference in Earning Reports" stroke="#8884d8" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        }
+                        />
+                    </GridItem>
+
+
                 </Grid>
                     
 
@@ -648,6 +676,22 @@ const Company = () => {
                             <Flex align="center" flexDirection="column">
                                 {sources}
                             </Flex>
+                        }
+                        />
+                    </GridItem>
+
+                    <GridItem w='100%' justifySelf="center">
+                        <GraphCard metricName={"Change in Earnings"} graph={
+                            <ResponsiveContainer isAnimationActive={false} width={'99%'} height={300}>
+                                <LineChart isAnimationActive={false} data={earnings}>
+                                    <CartesianGrid stroke="#ccc" fill="white"/>
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" isAnimationActive={false} dataKey="earned" name="Difference in Earning Reports" stroke="#8884d8" />
+                                </LineChart>
+                            </ResponsiveContainer>
                         }
                         />
                     </GridItem>
