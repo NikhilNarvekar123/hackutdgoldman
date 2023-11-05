@@ -46,10 +46,10 @@ class EconomicScraper:
         
         average_df = normalized_df.mean(axis=1)
 
-        producer_price_index_list = normalized_producer_price_index.iloc[::-1].tolist()
-        consumer_sentiment_list = normalized_consumer_sentiment.iloc[::-1].tolist()
-        financial_stress_list = normalized_financial_stress.iloc[::-1].tolist()
-        snp500_list = normalized_snp500.iloc[::-1].tolist()
+        producer_price_index_list = producer_price_index.iloc[::-1].tolist()
+        consumer_sentiment_list = consumer_sentiment.iloc[::-1].tolist()
+        financial_stress_list = financial_stress.iloc[::-1].tolist()
+        snp500_list = snp500.iloc[::-1].tolist()
         average_df_list = average_df.iloc[::-1].tolist()
 
         insertions = {
