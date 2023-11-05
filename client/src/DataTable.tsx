@@ -82,3 +82,5 @@ export function DataTable<Data extends object>({
     </Table>
   );
 }
+
+export default DataTable;
