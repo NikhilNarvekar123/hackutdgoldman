@@ -3,7 +3,7 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsi
 import { Container, Switch, Stack, Grid, GridItem, Image, Box, Text, Center, useColorModeValue, Heading, Avatar, Flex, propNames, Stat, StatLabel, StatNumber, StatArrow, StatHelpText } from '@chakra-ui/react';
 import Navbar from './Navbar';
 import { useState, useEffect } from "react";
-import {ArrowUpIcon, ArrowDownIcon} from '@chakra-ui/icons';
+import {ArrowUpIcon, ArrowDownIcon, CheckIcon, CloseIcon} from '@chakra-ui/icons';
 import { CircularProgressLabel, CircularProgress } from "@chakra-ui/react";
 
 
@@ -352,7 +352,7 @@ const Company = () => {
             <Avatar size="lg" />
             <Box mt={4} textAlign="center" marginBottom={8}>
             <Text fontSize={{base: 'xl'}} fontWeight={"bold"}>{data['name']}</Text>
-            <Text>Rank</Text>
+            <Text>{data['stock_info']['recommend'] != "none" ? (data['stock_info']['recommend'] == "yes" ? <><Text>Recommend&nbsp;<CheckIcon/></Text></> : <><Text>Don't Recommend&nbsp;<CloseIcon/></Text></>) : ""}</Text>
             <Text>{data['industry']}</Text>
             </Box>
             <div mt={4}>
